@@ -28,9 +28,9 @@ int main() {
         std::string stock;
         std::string price;
         std::string bs;
-
+        
         std::string temp = splitStrings[i];
-
+        if (temp == "$") break;
         std::string word = "";
     for (int j=0; j<temp.length(); j++) 
     {   
