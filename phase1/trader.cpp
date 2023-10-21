@@ -52,14 +52,11 @@ int main() {
 
     bs = temp[temp.length()-1];
 
-    cout<<"stock: "<<stock<<endl;
-    cout<<"price: "<<price<<endl;
-    cout<<"b/s: "<<bs<<endl;
+    int p = stoi(price);
 
-    //TILL HERE; I HAVE INPUTS AND HAVE STOCK, PRICE AND B/S STORED AS STRINGS.
+    //TILL HERE; I HAVE INPUTS AND HAVE STOCK(stock), B/S(bs) STORED AS STRING AND PRICE STORED AS INT(p).
     //NOW WE NEED TO PROCESS THIS DATA.
-    
-     
+
 }
 
 }
