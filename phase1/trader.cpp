@@ -28,9 +28,11 @@ int main() {
         std::string stock;
         std::string price;
         std::string bs;
-        
+
         std::string temp = splitStrings[i];
+
         if (temp == "$") break;
+
         std::string word = "";
     for (int j=0; j<temp.length(); j++) 
     {   
@@ -45,9 +47,6 @@ int main() {
         else {
             word = word + temp[j];
         }
-
-        
-        
     }
 
     bs = temp[temp.length()-1];
@@ -57,6 +56,26 @@ int main() {
     //TILL HERE; I HAVE INPUTS AND HAVE STOCK(stock), B/S(bs) STORED AS STRING AND PRICE STORED AS INT(p).
     //NOW WE NEED TO PROCESS THIS DATA.
 
+    //THIS IS THE CASE WHERE NEW PREV UNDECLARED STOCK COMES IN. (ADD CONDITION FOR STOCK NOT BEING IN THE LIST)
+    //if(condition) {
+    cout<<stock<<"  "<<price<<" ";
+    if (bs == "b") cout <<"s"<<endl;
+    else cout<<"b"<<endl;
+    //}
+
+    //THIS IS THE CASE WHERE STOCK IS ALREADY IN THE LIST.
+    int p_i;
+    //here i am assuming p_i is the price of last stock order.
+    //else {
+        if(p_i < p && bs=="b"){
+            cout<<stock<<"  "<<price<<" "<<"s"<<endl;
+        }
+        else if(p_i > p && bs=="s"){
+            cout<<stock<<"  "<<price<<" "<<"b"<<endl;
+        }
+
+        else cout<<"No Trade"<<endl;
+    //}
 }
 
 }
