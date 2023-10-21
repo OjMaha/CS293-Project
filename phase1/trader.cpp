@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+using namespace std;
 int main() {
 
     Receiver rcv;
@@ -22,8 +23,43 @@ int main() {
     }
 
     // Now, splitStrings contains the individual substrings
-    
+    for (int i = 0; i< splitStrings.size(); i++) {
+        int k = 0; //k is counter used to maintain which part of the string is being read (stock, price, b/s)
+        std::string stock;
+        std::string price;
+        std::string bs;
 
+        std::string temp = splitStrings[i];
+
+        std::string word = "";
+    for (int j=0; j<temp.length(); j++) 
+    {   
+        if (temp[j] == ' ')
+        {   
+            if(k == 0) stock = word;
+            else if(k == 1) price = word;
+            k++;
+            
+            word = "";
+        }
+        else {
+            word = word + temp[j];
+        }
+
+        
+        
+    }
+
+    bs = temp[temp.length()-1];
+
+    cout<<"stock: "<<stock<<endl;
+    cout<<"price: "<<price<<endl;
+    cout<<"b/s: "<<bs<<endl;
+
+    //TILL HERE; I HAVE INPUTS AND HAVE STOCK, PRICE AND B/S STORED AS STRINGS.
+    //NOW WE NEED TO PROCESS THIS DATA.
     
-    return 0;
+     
+}
+
 }

@@ -1,2 +1,40 @@
 Receiver is listening on port 8888
-ASML 650 sASML 645 bAAPL 430 bAAPL 435 bAAPL 435 sASML 646 bASML 647 bASML 651 bAAPL 432 sASML 654 sASML 652 sASML 650 s$
+stock: ASML
+price: 650
+b/s: s
+stock: ASML
+price: 645
+b/s: b
+stock: AAPL
+price: 430
+b/s: b
+stock: AAPL
+price: 435
+b/s: b
+stock: AAPL
+price: 435
+b/s: s
+stock: ASML
+price: 646
+b/s: b
+stock: ASML
+price: 647
+b/s: b
+stock: ASML
+price: 651
+b/s: b
+stock: AAPL
+price: 432
+b/s: s
+stock: ASML
+price: 654
+b/s: s
+stock: ASML
+price: 652
+b/s: s
+stock: ASML
+price: 650
+b/s: s
+stock: 
+price: 
+b/s: $
