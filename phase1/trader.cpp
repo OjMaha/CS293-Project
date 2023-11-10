@@ -8,37 +8,27 @@
 using namespace std;
 int main() {
     CustomMap<std::string, int> stockMap;  //gonna store stock name and price
-
     Receiver rcv;
+    
     sleep(5);
     std::string message = rcv.readIML();
     
-
     // Create a stringstream from the input string
     std::istringstream ss(message);
 
-    std::vector<std::string> splitStrings;
-    std::string token;
+    std::string eachline;
 
     // Split the string using the delimiter '#'
-    while (std::getline(ss, token, '#')) {
-        splitStrings.push_back(token);
-    }
+    while (std::getline(ss, eachline, '#')) {
 
-    // Now, splitStrings contains the individual substrings
-    for (int i = 0; i< splitStrings.size(); i++) {
+        if(eachline == "$") break;
+
         int k = 0; //k is counter used to maintain which part of the string is being read (stock, price, b/s)
         std::string stock;
         std::string price;
         std::string bs;
 
-        std::string temp = splitStrings[i];
-
-        if (temp == "$") break;
-
-        //TK: I'm changing the spllitting function as this is more compact and scalable.
-
-        std::istringstream iss(temp);
+        std::istringstream iss(eachline);
         std::string token;
         std::vector<std::string> tokens;
 
@@ -52,35 +42,7 @@ int main() {
         price = tokens[1];
         bs = tokens[2];
 
-
-
-        // std::string word = "";
-        // for (int j=0; j<temp.length(); j++) 
-        // {   
-        //     if (temp[j] == ' ')
-        //     {   
-        //         if(k == 0) stock = word;
-        //         else if(k == 1) price = word;
-        //         k++;
-                
-        //         word = "";
-        //     }
-        //     else {
-        //         word = word + temp[j];
-        //     }
-        // }
-
-        // bs = temp[temp.length()-1];
-
-        // int p = stoi(price);
-
-        //TILL HERE; I HAVE INPUTS AND HAVE STOCK(stock), B/S(bs) STORED AS STRING AND PRICE STORED AS INT(p).
-        //NOW WE NEED TO PROCESS THIS DATA.
-
-        //THIS IS THE CASE WHERE NEW PREV UNDECLARED STOCK COMES IN. (ADD CONDITION FOR STOCK NOT BEING IN THE LIST)
-
-        //cout << stock << " " << p << " " << bs;
-        if(stockMap.contains(stock) == false) {
+         if(stockMap.contains(stock) == false) {
             stockMap.insert(stock, p);
             cout<< stock <<" "<<p<<" ";
             if (bs == "b") cout <<"s"<<endl;
@@ -102,6 +64,8 @@ int main() {
             }
             else cout<<"No trade"<<endl;
         }
-    }
 
+        
+    }
 }
+

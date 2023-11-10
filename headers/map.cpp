@@ -69,7 +69,7 @@ public:
                 return pair.value;
             }
         }
-        throw std::out_of_range("Key not found");
+        return 0; // Return 0 if the key doesn't exist
     }
 
     // Remove a key-value pair from the map
