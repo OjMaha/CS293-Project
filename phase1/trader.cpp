@@ -6,32 +6,45 @@
 #include "../headers/map.cpp"
 #include "../headers/string_extra.cpp"
 using namespace std;
+
+struct Order{
+    CustomMap<std::string, int> stonks;
+    int price = 0;
+    char bs = 0;             //'b' for buy, 's' for sell
+    bool validity = true; //true if order is valid, false if order is invalid
+    vector <string> stonklist; ///maintain a list of stocks involved in an order
+
+};
 int main() {
-    CustomMap<std::string, int> stockMap;  //gonna store stock name and price
-    CustomMap<std::string, int> buyMap;    //gonna store stock name and lowest rejected buy price
-    CustomMap<std::string, int> sellMap;   //gonna store stock name and highest rejected sell price
+
+    vector <Order> orderlist;
 
     Receiver rcv;
-    
     sleep(5);
     std::string message = rcv.readIML();
     
+
     // Create a stringstream from the input string
     std::istringstream ss(message);
 
-    std::string eachline;
+    std::vector<std::string> splitStrings;
+    std::string token;
 
     // Split the string using the delimiter '#'
-    while (std::getline(ss, eachline, '#')) {
+    while (std::getline(ss, token, '#')) {
+        splitStrings.push_back(token);
+    }
 
-        if(eachline == "$") break;
-
+    // Now, splitStrings contains the individual substrings
+    for (int i = 0; i< splitStrings.size(); i++) {
         int k = 0; //k is counter used to maintain which part of the string is being read (stock, price, b/s)
-        std::string stock;
-        std::string price;
-        std::string bs;
+        std::string temp = splitStrings[i];
 
-        std::istringstream iss(eachline);
+        if (temp == "$") break;
+
+        //TK: I'm changing the spllitting function as this is more compact and scalable.
+
+        std::istringstream iss(temp);
         std::string token;
         std::vector<std::string> tokens;
 
@@ -39,48 +52,28 @@ int main() {
             token = strip(token);
             tokens.push_back(token);
         }
-        
-        stock = tokens[0];
-        int p = stoi(tokens[1]);
-        price = tokens[1];
-        bs = tokens[2];
 
-         if(stockMap.contains(stock) == false) {
-            stockMap.insert(stock, p);
-            cout<< stock <<" "<<p<<" ";
-            if (bs == "b") cout <<"s"<<endl;
-            else cout<<"b"<<endl;
+        Order o;
+        
+        int size = tokens.size();
+        if(tokens[size-1] == "b") o.bs = 'b';
+        else o.bs = 's';
+
+        o.price = stoi(tokens[size-2]);
+
+        for(int j = 0; j<size-2; j+=2){
+            o.stonks.insert(tokens[j], stoi(tokens[j+1]));
+            o.stonklist.push_back(tokens[j]); 
         }
 
-        //THIS IS THE CASE WHERE STOCK IS ALREADY IN THE LIST.
-        
-        //here i am assuming p_i is the price of last stock order.
-        else {
-            int p_i = stockMap.get(stock);
-            if(p_i < p && bs=="b" && (p > sellMap.get(stock) || sellMap.contains(stock) == false)){
-                stockMap.set(stock, p);
-                cout<<stock<<" "<<price<<" "<<"s"<<endl;
-            }
-            else if(p_i > p && bs=="s" && (p < buyMap.get(stock) || buyMap.contains(stock) == false)){
-                stockMap.set(stock, p);
-                cout<<stock<<" "<<price<<" "<<"b"<<endl;
-            }
-            else {
-                if(p_i >= p && bs=="b"){
-                    if(sellMap.get(stock) < p || sellMap.contains(stock) == false){
-                        sellMap.set(stock,p);
-                    }
-                }
-                else if(p_i <= p && bs=="s"){
-                    if(buyMap.get(stock) > p || buyMap.contains(stock) == false){
-                        buyMap.set(stock,p);
-                    }
-                }
-                cout<<"No trade"<<endl;
-            }
-        }
+        orderlist.push_back(o);
 
-        
-    }
+        for(int j = 0; j<orderlist.size(); j++){
+            for(int k = 0; k<orderlist[j].stonklist.size(); k++){
+                cout<<orderlist[j].stonklist[k] << " ";
+                cout<<orderlist[j].stonks.get(orderlist[j].stonklist[k]) << " ";
+            }
+            cout << orderlist[j].price << " " << orderlist[j].bs << "#" << endl;
+        }
 }
-
+}
