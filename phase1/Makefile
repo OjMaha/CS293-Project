@@ -28,6 +28,11 @@ runpart3: iml trader
 	./iml inputs/data3.txt
 	diff outputs/out3.txt output.txt
 
+ojas: iml trader
+	./trader 1 >output.txt &
+	sleep 1
+	./iml inputs/data4.txt
+
 clean:
 	rm -rf output.txt trader iml
 	rm -rf *~
