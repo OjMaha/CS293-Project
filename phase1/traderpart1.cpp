@@ -45,7 +45,7 @@ int main() {
         price = tokens[1];
         bs = tokens[2];
 
-         if(stockMap.contains(stock) == false) {
+        if(stockMap.contains(stock) == false) {
             stockMap.insert(stock, p);
             cout<< stock <<" "<<p<<" ";
             if (bs == "b") cout <<"s"<<endl;
@@ -57,13 +57,29 @@ int main() {
         //here i am assuming p_i is the price of last stock order.
         else {
             int p_i = stockMap.get(stock);
-            if(p_i < p && bs=="b" && (p > sellMap.get(stock) || sellMap.contains(stock) == false)){
+            if(p_i < p && bs=="b" && (p > sellMap.get(stock) || sellMap.contains(stock) == false) ){
                 stockMap.set(stock, p);
-                cout<<stock<<" "<<price<<" "<<"s"<<endl;
+
+                if(buyMap.get(stock) != p){
+                    cout<<stock<<" "<<price<<" "<<"s"<<endl;
+                }
+
+                else{
+                    buyMap.remove(stock);
+                    cout<<"No trade"<<endl;
+                }
             }
-            else if(p_i > p && bs=="s" && (p < buyMap.get(stock) || buyMap.contains(stock) == false)){
+            else if(p_i > p && bs=="s" && (p < buyMap.get(stock) || buyMap.contains(stock) == false) ){
                 stockMap.set(stock, p);
-                cout<<stock<<" "<<price<<" "<<"b"<<endl;
+
+                if(sellMap.get(stock) != p){
+                    cout<<stock<<" "<<price<<" "<<"b"<<endl;
+                }
+                else{
+                    sellMap.remove(stock);
+                    cout<<"No trade"<<endl;
+                }
+
             }
             else {
                 if(p_i >= p && bs=="b"){

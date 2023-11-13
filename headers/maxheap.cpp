@@ -1,6 +1,7 @@
 #include <iostream>
-#include "maxheap.h"
+#include <vector>
 
+// maxheap class
 class maxheap
 {
 public:

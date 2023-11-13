@@ -7,8 +7,8 @@ all: trader iml
 trader: trader.cpp receiver.h
 	g++ -std=c++20 trader.cpp -o trader
 
-ojas_trader: lessgo.cpp receiver.h
-	g++ -std=c++20 lessgo.cpp -o ojas_trader
+ojas_trader: traderpart1.cpp receiver.h
+	g++ -std=c++20 traderpart1.cpp -o ojas_trader
 
 iml: iml.cpp
 	g++ -std=c++20 iml.cpp -o iml
