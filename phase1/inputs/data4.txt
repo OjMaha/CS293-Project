@@ -1,17 +1,4 @@
-A 40 s#
-A 30 s#
-A 40 s#
-A 30 s#
-A 70 b#
-A 60 b#
-A 30 b#
-A 30 s#
-
-A 40 b
-A 30 b
-No trade
-No trade
-A 70 s
-No trade
-No trade
-A 30 b
+A 150 s#
+A 140 b#
+A 110 s#
+A 120 b#
