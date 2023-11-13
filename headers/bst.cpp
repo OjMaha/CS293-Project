@@ -1,17 +1,15 @@
 #include <iostream>
 using namespace std;
 
-class BST {
-public:
-    struct Node {
+struct Node {
         int price;
         int quantity;
         Node* left;
         Node* right;
     };
 
-    Node* root;
-
+class BST {
+public:
     Node* node(int p, int q)  
     {  
     Node* node = new Node;  
@@ -64,21 +62,6 @@ public:
     return (cur != NULL);
     }
 
-    bool search(int p) {
-    Node* cur = root;
-    Node* parent = NULL;
-    
-    while (cur != NULL && cur->price != p) {
-        parent = cur;
-        if (p < cur->price)
-            cur = cur->left;
-        else
-            cur = cur->right;
-    }
-
-    return (cur != NULL);
-    }
-
     void deletion(Node*& root, int p) /*function to delete a node*/  
     {  
     Node* parent = NULL;  
@@ -121,15 +104,30 @@ public:
         free(cur);  
     }  
     } 
-
+    public:
     BST() : root(nullptr) {}
 
+    Node* root;
     void insert(int p, int q) {
         root = insert(root, p, q);
     }
 
     void insert(int p) {
         root = insert(root, p);
+    }
+
+    bool search(int p) {
+        Node* cur = root;
+        while (cur != nullptr) {
+            if (p == cur->price) {
+                return true; // Key found
+            } else if (p < cur->price) {
+                cur = cur->left; // Search in the left subtree
+            } else {
+                cur = cur->right; // Search in the right subtree
+            }
+        }
+        return false; // Key not found
     }
 
     void remove(int p) {
@@ -146,7 +144,7 @@ public:
         deleteTree(root);
     }
 
-
+private:
     /*Inorder traversal of the tree formed*/  
     void inorder(Node *root)  
     {  
@@ -184,7 +182,8 @@ public:
 
 //     cout << "\nInorder traversal after deletion:" << endl;
 //     myBST.inorder();
-//     cout<<myBST.search(50);
+//     cout <<endl;
+//     cout<<myBST.root->price<<endl;
 
 //     return 0;
 // }

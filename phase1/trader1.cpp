@@ -6,11 +6,12 @@
 #include "../headers/map.cpp"
 #include "../headers/string_extra.cpp"
 #include "../headers/bst.cpp"
+#include <map>
 
 using namespace std;
 int main() {
-    CustomMap<std::string, int> stockMap;  //gonna store stock name and price
-    CustomMap<std::string, BST> rejected;    //gonna store stock name and rejected trades in a bst (buy orders are positive, sell orders are negative)
+    map<std::string, int> stockMap;  //gonna store stock name and price
+    map<std::string, BST> rejected;    //gonna store stock name and rejected trades in a bst (buy orders are positive, sell orders are negative)
 
     Receiver rcv;
     
@@ -49,66 +50,55 @@ int main() {
         int pp = p;             //this is the value in BST
         if(bs == "s") pp*=-1;
 
-         if(stockMap.contains(stock) == false) {
-            stockMap.insert(stock, p);
+        if(stockMap.contains(stock) == false) {
+            stockMap.insert({stock, p});
             cout<< stock <<" "<<price<<" ";
             if (bs == "b") cout <<"s"<<endl;
             else cout<<"b"<<endl;
         }
-
+        
         //THIS IS THE CASE WHERE STOCK IS ALREADY IN THE LIST.
         
-        //check for cancellations
-        else if(rejected.contains(stock) == true){
-            BST temp = rejected.get(stock);
-            cout<<"hai babaaa"<<endl;
-            if (temp.search(pp) == true){
-                cout<<"No trade"<<endl;
-                temp.remove(pp);
-                continue;
-            }
+        //first check for cancellations
+        else if(rejected.contains(stock) == true && rejected[stock].search(pp*(-1)) == true){
+                rejected[stock].remove(pp);
+                cout << "No trade"<<endl;
         }
 
         //not cancelled, so check for trade
-        //here i am assuming p_i is the price of last stock order.
+
+        else if(stockMap[stock] < p && bs=="b"){
+            stockMap[stock] = p;
+            cout<<stock<<" "<<price<<" "<<"s"<<endl;
+        }
+        else if(stockMap[stock] > p && bs=="s"){
+            stockMap[stock] = p;
+            cout<<stock<<" "<<price<<" "<<"b"<<endl;
+        }
+
         else {
-            int p_i = stockMap.get(stock);
-            if(p_i < p && bs=="b"){
-                stockMap.set(stock, p);
-                cout<<stock<<" "<<price<<" "<<"s"<<endl;
-            }
-            else if(p_i > p && bs=="s"){
-                stockMap.set(stock, p);
-                cout<<stock<<" "<<price<<" "<<"b"<<endl;
+            //rejected trade
+            //add it to the rejected BST
+            
+            if(rejected.contains(stock) == false){
+            
+                rejected[stock] = BST(); 
+                rejected[stock].insert(pp,0);
+ 
             }
 
             else {
-                //rejected trade
-                //add it to the rejected BST
-                
-                if(rejected.contains(stock) == false){
-                    
-                    BST temp;
-                    temp.insert(pp);
-                    cout<<temp.search(pp)<<endl;
-                    
-                    rejected.set(stock, temp);
-                    
-
-                }
-
-                else {
-                    BST temp = rejected.get(stock);
-                    temp.insert(pp);
-                    rejected.set(stock, temp);
-                }
-
-                
-                cout<<"No trade"<<endl;
+                rejected[stock].insert(pp,0);
             }
-        }
+            
+            cout<<"No trade"<<endl;
 
-        
+            
+        }
+            for(auto it = rejected.begin(); it != rejected.end(); it++){
+                cout<<it->first<<" ";
+                it->second.inorder();
+                cout<<endl;
+            }
     }
 }
-

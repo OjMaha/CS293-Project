@@ -25,13 +25,12 @@ public:
     return node(p, 0);
     }
 
-    Node* findMinimum(Node* cur) /*To find the inorder successor*/  
-    {  
-    while(cur->left != NULL) {  
-        cur = cur->left;  
-    }  
-    return cur;  
-    }  
+    Node* findMinimum(Node* cur) {
+    while (cur->left != NULL) {
+        cur = cur->left;
+    }
+    return cur;
+}
 
     Node* insert(Node* root, int p, int q) /*Insert a node*/  
     {  

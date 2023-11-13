@@ -1,9 +1,17 @@
-bruh
 Receiver is listening on port 8888
-<<<<<<< Updated upstream
-=======
 A 40 b
-1
-inserted
- 
->>>>>>> Stashed changes
+A 30 b
+No trade
+A -40   
+No trade
+A -40   -30   
+A 70 s
+A -40   -30   
+No trade
+A -40   -30   60   
+No trade
+A -40   -30   60   
+A 30 b
+A -40   -30   60   
+No trade
+A -40   -30   60   
