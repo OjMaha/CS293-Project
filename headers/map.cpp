@@ -69,7 +69,9 @@ public:
                 return pair.value;
             }
         }
-        return 0; // Return 0 if the key doesn't exist
+        // If the key doesn't exist, return a default-constructed object of type V
+    return V();
+        
     }
 
     // Remove a key-value pair from the map

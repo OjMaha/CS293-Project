@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "../headers/map.cpp"
+#include <map>
 #include "../headers/string_extra.cpp"
 #include "../headers/bst.cpp"
 
 using namespace std;
 int main() {
-    CustomMap<std::string, int> stockMap;  //gonna store stock name and price
-    CustomMap<std::string, BST> rejected;    //gonna store stock name and rejected trades in a bst (buy orders are positive, sell orders are negative)
+    map<std::string, int> stockMap;  //gonna store stock name and price
+    map<std::string, BST> rejected;    //gonna store stock name and rejected trades in a bst (buy orders are positive, sell orders are negative)
 
     Receiver rcv;
     
@@ -49,8 +49,8 @@ int main() {
         int pp = p;             //this is the value in BST
         if(bs == "s") pp*=-1;
 
-         if(stockMap.contains(stock) == false) {
-            stockMap.insert(stock, p);
+         if(stockMap.count(stock) == 0) {
+            stockMap.insert({stock, p});
             cout<< stock <<" "<<price<<" ";
             if (bs == "b") cout <<"s"<<endl;
             else cout<<"b"<<endl;
@@ -60,7 +60,7 @@ int main() {
         
         //check for cancellations
         else if(rejected.contains(stock) == true){
-            BST temp = rejected.get(stock);
+            BST temp = rejected[stock];
             cout<<"hai babaaa"<<endl;
             if (temp.search(pp) == true){
                 cout<<"No trade"<<endl;
@@ -72,13 +72,13 @@ int main() {
         //not cancelled, so check for trade
         //here i am assuming p_i is the price of last stock order.
         else {
-            int p_i = stockMap.get(stock);
+            int p_i = stockMap[stock];
             if(p_i < p && bs=="b"){
-                stockMap.set(stock, p);
+                stockMap[stock] = p;
                 cout<<stock<<" "<<price<<" "<<"s"<<endl;
             }
             else if(p_i > p && bs=="s"){
-                stockMap.set(stock, p);
+                stockMap[stock] = p;
                 cout<<stock<<" "<<price<<" "<<"b"<<endl;
             }
 
@@ -87,20 +87,20 @@ int main() {
                 //add it to the rejected BST
                 
                 if(rejected.contains(stock) == false){
-                    
+
                     BST temp;
                     temp.insert(pp);
                     cout<<temp.search(pp)<<endl;
                     
-                    rejected.set(stock, temp);
-                    
+                    rejected.insert({stock, temp});
+                    cout <<"inserted"<<endl;
 
                 }
 
                 else {
-                    BST temp = rejected.get(stock);
+                    BST temp = rejected[stock];
                     temp.insert(pp);
-                    rejected.set(stock, temp);
+                    rejected[stock] = temp;
                 }
 
                 

@@ -1,2 +1,9 @@
 bruh
 Receiver is listening on port 8888
+<<<<<<< Updated upstream
+=======
+A 40 b
+1
+inserted
+ 
+>>>>>>> Stashed changes

@@ -5,6 +5,7 @@
 #include <sstream>
 #include "../headers/map.cpp"
 #include "../headers/string_extra.cpp"
+#include "../headers/bst.cpp"
 using namespace std;
 
 struct Order{
