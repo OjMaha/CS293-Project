@@ -13,7 +13,7 @@ struct Order{
     int price = 0;
     char bs = 0;             //'b' for buy, 's' for sell
     bool validity = true; //true if order is valid, false if order is invalid
-    vector <string> stonklist; ///maintain a list of stocks involved in an order
+    vector <string> stonklist; //maintain a list of stocks involved in an order
 };
 
 struct Combo{
@@ -29,7 +29,7 @@ Combo CyclePossible(vector <Order> orderlist, int i, Order upTillNowOg, vector <
     Order upTillNow = upTillNowOg;
     vector <int> includedinorder = includedinorderOg;
     Combo ans1;
-    cout << "hello1\n";
+    cout << "hello1" << endl;
     bool cycle = true;
     for(int k = 0; k<upTillNow.stonklist.size(); k++){
         if(upTillNow.stonks.get(upTillNow.stonklist[k]) != 0){
@@ -38,7 +38,7 @@ Combo CyclePossible(vector <Order> orderlist, int i, Order upTillNowOg, vector <
             break;
         }
     }
-    cout << "hello2\n";
+    cout << "hello2" << endl;
     // if(upTillNow.stonklist.size() == 3){
     //     cout << "Cycle Where?\n";
     //     cout << cycle << endl;
@@ -52,7 +52,7 @@ Combo CyclePossible(vector <Order> orderlist, int i, Order upTillNowOg, vector <
         //cout << "A cycle has been found!! \n";
         return ans1;
     }
-    cout << "hello3\n";
+    cout << "hello3" << endl;
     //base cases of the recursion
     if(i < 0){
         // cout << "Reached the end; 1 out of 2^n possibilities evaluated and rejected\n";
@@ -69,6 +69,7 @@ Combo CyclePossible(vector <Order> orderlist, int i, Order upTillNowOg, vector <
     //onto the main function
     
     cout << "hello4\n";
+
 
     ans1 = CyclePossible(orderlist, i-1, upTillNow, includedinorder); //can a cycle exist without this order?
 
@@ -115,7 +116,7 @@ Combo CyclePossible(vector <Order> orderlist, int i, Order upTillNowOg, vector <
     cout << "hello7\n";
     Combo ans2 = CyclePossible(orderlist, i-1, upTillNow, includedinorder); //can a cycle exist with this order?
     cout << "hello8\n";
-    if(ans1.possible && ans2.possible) { //both possible? return the one with max price
+    if(ans1.possible && ans1.price > 0 && ans2.possible && ans2.price > 0) { //both possible? return the one with max price
         if(ans1.price > ans2.price){
             return ans1;
         }
@@ -123,7 +124,7 @@ Combo CyclePossible(vector <Order> orderlist, int i, Order upTillNowOg, vector <
             return ans2;
     }
     cout << "hello9\n";
-    if(ans1.possible)
+    if(ans1.possible && ans1.price > 0)
         return ans1;
     else
         return ans2;
@@ -185,7 +186,7 @@ int main() {
         //cout << "check2 \n";
         for(int j = 0; j<size-2; j+=2){
             //insert -ve quantities if selling
-            o.stonks.insert(tokens[j], stoi(tokens[j+1]));// * (orderlist[j].bs == 'b' ? 1 : -1));
+            o.stonks.insert(tokens[j], (stoi(tokens[j+1]) * (orderlist[j].bs == 'b' ? 1 : -1)));// * (orderlist[j].bs == 'b' ? 1 : -1));
             o.stonklist.push_back(tokens[j]); 
         }
         cout << "check3\n";
@@ -198,7 +199,8 @@ int main() {
 
         Order upTillNow;
         vector <int> includedinorder;
-        Combo cycle = CyclePossible(orderlist, orderlist.size(), upTillNow, includedinorder);
+        includedinorder.push_back(orderlist.size()-1);
+        Combo cycle = CyclePossible(orderlist, orderlist.size() - 1, upTillNow, includedinorder);
         cout << "Check5\n";
         cout << cycle.possible << endl;
         cout << cycle.price << endl;
