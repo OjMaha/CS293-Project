@@ -7,8 +7,8 @@ all: trader iml
 trader: trader.cpp receiver.h
 	g++ -std=c++20 trader.cpp -o trader
 
-ojas_trader: traderpart1.cpp receiver.h
-	g++ -std=c++20 traderpart1.cpp -o ojas_trader
+ojas_trader: traderpart2.cpp receiver.h
+	g++ -std=c++20 traderpart2.cpp -o ojas_trader
 
 iml: iml.cpp
 	g++ -std=c++20 iml.cpp -o iml
@@ -32,7 +32,7 @@ runpart3: iml trader
 	diff outputs/out3.txt output.txt
 
 ojas: iml ojas_trader
-	./ojas_trader 1 >output.txt &
+	./ojas_trader 2 > output.txt &
 	sleep 1
 	./iml inputs/data4.txt
 
