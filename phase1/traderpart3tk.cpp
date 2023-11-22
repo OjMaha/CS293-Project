@@ -15,33 +15,49 @@ struct Order{
     map<std::string, int> stonks;
     int price = 0;
     char bs = 0;             //'b' for buy, 's' for sell
-    bool validity = true; //true if order is valid, false if order is invalid
+    int quantity = 0; //quantity of order remaining
     vector <string> stonklist; //maintain a list of stocks involved in an order
 };
 
 //document this pwease
-void generate_string(vector <string> &possibilities, int size){
+void generate_string(vector <vector <int>> &possibilities, int size, int quantity){
     if(size == 0){
         return;
     }
     if(size == 1){
-        possibilities.push_back("1");
-        possibilities.push_back("0");
+        for(int i = quantity; i>=0; i--){
+            vector <int> a;
+            a.push_back(i);
+            possibilities.push_back(a);
+        }
         return;
     }
 
     if(size == 2){
-        possibilities.push_back(possibilities[0] + "0");
-        possibilities[0] = possibilities[0] + "1";
-        possibilities.push_back(possibilities[1] + "0");
-        possibilities[1] = possibilities[1] + "1";
+        int s = possibilities.size();
+        for(int i = quantity-1; i>=0; i--){          //for all possible quantities q-1 to 0
+            for(int j = 0; j < s; j++){   //for all previous possibilities
+                vector <int> a = possibilities[j];
+                a.push_back(i);
+                possibilities.push_back(a);
+            }
+        }
+        for(int j = 0; j < s; j++){                 //for quantity = q
+            possibilities[j].push_back(quantity);
+        }
         return;
     }
     else{
-        ll total = possibilities.size();
-        for(ll i = 0; i< total; i++){
-            possibilities.push_back(possibilities[i]+ "0");
-            possibilities[i] = possibilities[i] + "1";
+        int s = possibilities.size();
+        for(int i = quantity-1; i>=0; i--){          //for all possible quantities q-1 to 0
+            for(int j = 0; j < s; j++){   //for all previous possibilities
+                vector <int> a = possibilities[j];
+                a.push_back(i);
+                possibilities.push_back(a);
+            }
+        }
+        for(int j = 0; j < s; j++){                 //for quantity = q
+            possibilities[j].push_back(quantity);
         }
     }
 }
@@ -58,18 +74,22 @@ void print_all_orders(vector <Order> &orderlist){
     }
 }
 
-void print_all_possibilities(vector <string> &possibilities){
+void print_all_possibilities(vector <vector<int>> &possibilities){
     for(int i = 0; i<possibilities.size(); i++){
-        cout<<possibilities[i]<<endl;
+        for(int j = 0; j<possibilities[i].size(); j++){
+            cout<<possibilities[i][j]<<" ";
+        }
+        cout<<endl;
     }
+    cout<<endl;
 }
 
 int main(){
-    vector <string> possibilities;
-    generate_string(possibilities, 0);
+    vector <vector<int>> possibilities;
+    generate_string(possibilities, 0, 0);
     vector <Order> orderlist;
     int total_profit = 0;
-
+    
     Receiver rcv;
     
     sleep(5);
@@ -113,10 +133,11 @@ int main(){
         if(tokens[size-1] == "b") o.bs = 'b';
         else o.bs = 's';
 
-        o.price = stoi(tokens[size-2]);
+        o.quantity = stoi(tokens[size-2]);
+        o.price = stoi(tokens[size-3]);
         o.price *= o.bs == 'b' ? 1 : -1;   //take everything positive if buy, negative if sell
 
-        for(int j = 0; j<size-2; j+=2){
+        for(int j = 0; j<size-3; j+=2){
             //insert -ve quantities if selling
             o.stonks[tokens[j]]= (stoi(tokens[j+1]) * (o.bs == 'b' ? 1 : -1));// * (orderlist[j].bs == 'b' ? 1 : -1));
             o.stonklist.push_back(tokens[j]); 
@@ -129,7 +150,8 @@ int main(){
 
     //now arbitrage checker
     int n = orderlist.size();
-    generate_string(possibilities, n);      //generate all possible combinations of orders
+    int q = o.quantity;
+    generate_string(possibilities, n, o.quantity);      //generate all possible combinations of orders
 
     //cout<<"PEHLE ";print_all_possibilities(possibilities);
     
@@ -140,30 +162,33 @@ int main(){
     int profit = 0;
     int possibility_number = -1;
 
-    for(int i = 0; i<m/2; i++){
+    for(int i = 0; i<m; i++){
         map<string, int> considered_stonks;     //maintain a list of stonks considered for arbitrage with qty
         int temp_profit = 0;
         bool flag = true;      //arbitrage checker
 
         //considering the ith possibility
-        for(int j = 0; j<n; j++){
-            if(possibilities[i][j] == '1'){
+        for(ll j = 0; j < (n*q)/q+1; j++){
+            if(possibilities[i][j] != 0){
+                int quan = possibilities[i][j];
+
                 //considering the jth order
                 for(auto it = orderlist[j].stonks.begin(); it != orderlist[j].stonks.end(); it++){
                     //considering the kth stonk
                     if(considered_stonks.find(it->first) == considered_stonks.end()){
                         //if stonk not found in considered_stonks
-                        considered_stonks[it->first] = it->second;
+                        considered_stonks[it->first] = it->second * quan;
                     }
                     else{
                         //if stonk found in considered_stonks
-                        considered_stonks[it->first] += it->second;
+                        considered_stonks[it->first] += it->second * quan;
                     }
                 }
 
-                temp_profit += orderlist[j].price;
+                temp_profit += orderlist[j].price * quan;
             }
         }
+
 
         //check if total qty of all stonks become zero
 
@@ -173,6 +198,7 @@ int main(){
                 break;
             }
         }
+
         //cout<<"flag: "<<flag<<endl;
 
 
@@ -193,13 +219,53 @@ int main(){
 
         //store the order indices in a vector
         vector <int> order_indices;
+        vector <int> order_quantities;
         for(int j = 0; j<n; j++){
-            if(possibilities[possibility_number][j] == '1'){
+            if(possibilities[possibility_number][j] != 0){
+                order_quantities.push_back(possibilities[possibility_number][j]);
                 order_indices.push_back(j);
             }
         }
 
-        //check if any order is getting cancelled
+        for(int j = order_indices.size()-1; j >= 0; j--){                      //reverse print
+            int multiplier = 1;
+            if(orderlist[order_indices[j]].bs == 's') multiplier = -1;
+            for(auto it = orderlist[order_indices[j]].stonks.begin(); it != orderlist[order_indices[j]].stonks.end(); it++){
+                    cout << it->first  << " " << it->second * multiplier << " ";
+            }
+            cout << order_quantities[j] << " ";                               //print quantities used
+            orderlist[order_indices[j]].quantity -= order_quantities[j];      //update quantities
+            cout << orderlist[order_indices[j]].price << " ";
+            if(orderlist[order_indices[j]].bs == 'b') cout << "s";
+            else cout << "b";
+            cout << endl;
+        }
+
+
+
+        for(int k = 0; k<order_indices.size(); k++){       //never to be considered again
+            for(int l = 0; l<possibilities.size(); l++){
+                if(possibilities[l][order_indices[k]] > order_quantities[k]) 
+                    possibilities[l][order_indices[k]] -= order_quantities[k]; //decrease all the quantities
+                else
+                    possibilities[l][order_indices[k]] = 0;                    //make it 0 if less than quantity
+            }     
+        }
+
+            total_profit += profit;
+    }
+
+    else cout <<"No trade"<<endl;
+    // cout<<"baadme: "; print_all_possibilities (possibilities);
+
+    }
+    cout<<total_profit<<endl;
+}
+
+
+
+
+/*//check if any order is getting cancelled
         for(int i = 0; i<order_indices.size()-1; i++){
             for (int j = i+1; j<order_indices.size(); j++){
                 bool flag = false;
@@ -220,34 +286,4 @@ int main(){
                 else flag = false;
             }
         }
-        //it makes canceled orders 0 in all possibilities
-
-        for(int j = n-1; j>=0; j--){        //reverse orderprint
-            if(possibilities[possibility_number][j] == '1'){
-                int multiplier = 1;
-                if(orderlist[j].bs == 's') multiplier = -1;
-                for(auto it = orderlist[j].stonks.begin(); it != orderlist[j].stonks.end(); it++){
-                        cout << it->first  << " " << it->second * multiplier << " ";
-                }
-
-                cout << orderlist[j].price << " ";
-                if(orderlist[j].bs == 'b') cout << "s";
-                else cout << "b";
-                cout << endl;
-            }
-
-        }
-
-        for(int k = 0; k<order_indices.size(); k++){       //never to be considered again
-            for(int l = 0; l<possibilities.size(); l++) possibilities[l][order_indices[k]] = '0';       
-        }
-
-            total_profit += profit;
-    }
-
-    else cout <<"No trade"<<endl;
-    // cout<<"baadme: "; print_all_possibilities (possibilities);
-
-    }
-    cout<<total_profit<<endl;
-}
+        //it makes canceled orders 0 in all possibilities*/
