@@ -35,7 +35,7 @@ public:
 		if(later.bs == 1 && later.price < first.price) return false;
 		if(later.bs == -1 && later.price > first.price) return false;
 		if(later.issue > first.expiry && first.expiry != -1) return false;
-		
+		if(later.quantity == 0 || first.quantity == 0) return false;		
 		return true;
 	}
 

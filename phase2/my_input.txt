@@ -16,6 +16,3 @@ TL
 7 KarGoCorp SELL GE $50 #15 -1
 7 KarGoKrab BUY GE $110 #10 3
 !@
-c
-
-line

@@ -7,13 +7,14 @@
 #include <map>
 using namespace std;
 
-//
+
 struct executed_order{
     string buyer;
     string seller;
     string stonk;
     int price;
     int quantity;
+    int index;
 };
 
 void print_order(order o){
@@ -22,10 +23,20 @@ void print_order(order o){
 }
 
 void print_executed_order(executed_order e){
-    cout << "buyer:"<<e.buyer << " " <<"seller:"<< e.seller << " " <<"stonk:"<< e.stonk 
-    << " " <<"price:"<< e.price << " " << "quantity:"<<e.quantity << endl;
+    cout<< e.buyer<<" purchased "<< e.quantity << " share of "<< e.stonk << " from "<< e.seller << " for $"<< e.price << "/share"<< endl;
 }
 
+void print_matches(vector<executed_order> matches){
+    for(int i = 0; i<matches.size(); i++){
+        print_executed_order(matches[i]);
+    }
+}
+
+void print_all_orders(vector<order> orders){
+    for(int i = 0; i<orders.size(); i++){
+        print_order(orders[i]);
+    }
+}
 
 
 market::market(int argc, char** argv)
@@ -93,9 +104,15 @@ market::market(int argc, char** argv)
 
     // Close the file
     inputFile.close();
+
+    // for(int i = 0; i<all_orders.size(); i++){
+    //     print_order(all_orders[i]);
+    // }
+    
+
 }
 
-//note that buy_orders, sell_orders and all_orders are sorted by time
+//note thaat buy_orders, sell_orders and all_orders are sorted by time
 
 void market::start()
 {  
@@ -103,58 +120,179 @@ void market::start()
 
     for(int i=0;i<all_orders.size();i++){
         if(all_orders[i].bs == 1){
+            vector <executed_order> possible_matches;
             for(int j = 0; j< sell_orders.size(); j++){
                 order b = all_orders[i];
                 order s = sell_orders[j];
 
                 if(s.issue > b.issue) break;
-                if(valid_orders(b,s)){
+                if(valid_orders(b,s) && b.price >= s.price){
+                    
                     executed_order e;
                     e.buyer = b.broker;
                     e.seller = s.broker;
                     e.stonk = b.stonk;
                     e.price = s.price;
                     e.quantity = min(b.quantity, s.quantity);
+                    e.index = j;
 
                     if (e.quantity == 0) continue;
-
-                    executed.push_back(e);
-
-                    all_orders[i].quantity -= e.quantity;
-                    sell_orders[j].quantity -= e.quantity;
-                    buy_orders[indices[i]].quantity -= e.quantity;
-
-                    print_executed_order(e);
-                    if(b.quantity == 0) break;
+                    else possible_matches.push_back(e);
                 }
             }
+
+            //sort possible matches by price (descending), then quantity(descending), then timestamp(ascending), then stonk alphabetically(ascending)
+            for(int i = 0; i<possible_matches.size(); i++){
+                for(int j = i+1; j<possible_matches.size(); j++){
+                    if(possible_matches[i].price < possible_matches[j].price){
+                        swap(possible_matches[i], possible_matches[j]);
+                    }
+                    else if(possible_matches[i].price == possible_matches[j].price){
+                        if(possible_matches[i].quantity < possible_matches[j].quantity){
+                            swap(possible_matches[i], possible_matches[j]);
+                        }
+                        else if(possible_matches[i].quantity == possible_matches[j].quantity){
+                            if(possible_matches[i].buyer > possible_matches[j].buyer){
+                                swap(possible_matches[i], possible_matches[j]);
+                            }
+                            else if(possible_matches[i].buyer == possible_matches[j].buyer){
+                                if(possible_matches[i].seller > possible_matches[j].seller){
+                                    swap(possible_matches[i], possible_matches[j]);
+                                }
+                                else if(possible_matches[i].seller == possible_matches[j].seller){
+                                    if(possible_matches[i].stonk > possible_matches[j].stonk){
+                                        swap(possible_matches[i], possible_matches[j]);
+                                    }
+                                } 
+                            }
+                        }
+                    }
+                }
+            }
+
+            //now execute the matches
+            for(int m = 0; m<possible_matches.size(); i++){
+                executed.push_back(possible_matches[m]);
+                int j = possible_matches[m].index;
+
+                all_orders[i].quantity -= possible_matches[m].quantity;
+                sell_orders[j].quantity -= possible_matches[m].quantity;
+                buy_orders[indices[i]].quantity -= possible_matches[m].quantity;
+
+                print_executed_order(possible_matches[m]);
+
+                if(all_orders[i].quantity == 0) break;  //if buy order is completely executed, move on to next buy order
+
+            }
+
+            
+            
         }
 
         else{
+            vector <executed_order> possible_matches;
             for(int j = 0; j< buy_orders.size(); j++){
                 order b = buy_orders[j];
                 order s = all_orders[i];
 
-                if(b.issue > s.issue) break;
-                if(valid_orders(b,s)){
+                if(b.issue >= s.issue) break;    //here equal to as im giving priority to buy orders
+                if(valid_orders(s,b) && b.price >= s.price){
+                    
                     executed_order e;
                     e.buyer = b.broker;
                     e.seller = s.broker;
                     e.stonk = b.stonk;
                     e.price = b.price;
+                    e.index = j;
                     e.quantity = min(b.quantity, s.quantity);
 
                     if (e.quantity == 0) continue;
-                    executed.push_back(e);
 
-                    all_orders[i].quantity -= e.quantity;
-                    buy_orders[j].quantity -= e.quantity;
-                    sell_orders[indices[i]].quantity -= e.quantity;
+                    else possible_matches.push_back(e);  
+                }
 
-                    print_executed_order(e);
-                    if(s.quantity == 0) break;
+            }
+
+            //sort possible matches by price (descending), then quantity(descending), then timestamp(ascending), then stonk alphabetically(ascending)
+            for(int i = 0; i<possible_matches.size(); i++){
+                for(int j = i+1; j<possible_matches.size(); j++){
+                    if(possible_matches[i].price < possible_matches[j].price){
+                        swap(possible_matches[i], possible_matches[j]);
+                    }
+                    else if(possible_matches[i].price == possible_matches[j].price){
+                        if(possible_matches[i].quantity < possible_matches[j].quantity){
+                            swap(possible_matches[i], possible_matches[j]);
+                        }
+                        else if(possible_matches[i].quantity == possible_matches[j].quantity){
+                            if(possible_matches[i].buyer > possible_matches[j].buyer){
+                                swap(possible_matches[i], possible_matches[j]);
+                            }
+                            else if(possible_matches[i].buyer == possible_matches[j].buyer){
+                                if(possible_matches[i].seller > possible_matches[j].seller){
+                                    swap(possible_matches[i], possible_matches[j]);
+                                }
+                                else if(possible_matches[i].seller == possible_matches[j].seller){
+                                    if(possible_matches[i].stonk > possible_matches[j].stonk){
+                                        swap(possible_matches[i], possible_matches[j]);
+                                    }
+                                } 
+                            }
+                        }
+                    }
                 }
             }
+
+             //now execute the matches
+            for(int m = 0; m<possible_matches.size(); m++){
+                executed.push_back(possible_matches[m]);
+                int j = possible_matches[m].index;
+
+                all_orders[i].quantity -= possible_matches[m].quantity;
+                buy_orders[j].quantity -= possible_matches[m].quantity;
+                sell_orders[indices[i]].quantity -= possible_matches[m].quantity;
+
+                print_executed_order(possible_matches[m]);
+
+                if(all_orders[i].quantity == 0) break;  //ifsell order is completely executed, move on to next buy order
+
+            }
+
+            
         }
+    }
+
+    //NOW PROCESS END OF DAY OUTPUT hehe
+    int total_money_transferred = 0;
+    int num_shares_traded = 0;
+    map<string, vector<int>> broker_stats;  //broker name, [num shares bought, num shares sold, total money]
+    for(int i = 0; i<executed.size(); i++){
+        total_money_transferred += executed[i].price * executed[i].quantity;
+        num_shares_traded += executed[i].quantity;
+        
+        if(broker_stats.find(executed[i].buyer) == broker_stats.end()){
+            broker_stats[executed[i].buyer] = {executed[i].quantity, 0, -1*executed[i].price*executed[i].quantity};
+        }
+        else{
+            broker_stats[executed[i].buyer][0] += executed[i].quantity;
+            broker_stats[executed[i].buyer][2] -= executed[i].price*executed[i].quantity;
+        }
+
+        if(broker_stats.find(executed[i].seller) == broker_stats.end()){
+            broker_stats[executed[i].seller] = {0, executed[i].quantity, executed[i].price*executed[i].quantity};
+        }
+        else{
+            broker_stats[executed[i].seller][1] += executed[i].quantity;
+            broker_stats[executed[i].seller][2] += executed[i].price*executed[i].quantity;
+        }
+    }
+
+    cout<<endl;
+    cout<<"---End of Day---"<<endl;
+    cout<<"Total Amount of Money Transferred: $"<<total_money_transferred<<endl;
+    cout<<"Number of Completed Trades: "<<executed.size()<<endl;
+    cout<<"Number of Shares Traded: "<<num_shares_traded<<endl;
+    
+    for(auto it = broker_stats.begin(); it != broker_stats.end(); it++){
+        cout<<it->first<<" bought "<<it->second[0]<<" and sold "<<it->second[1]<<" for a net transfer of $"<<it->second[2]<<endl;
     }
 }
