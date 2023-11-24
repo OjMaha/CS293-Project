@@ -30,14 +30,17 @@ int main() {
             if(broken){
                 eachline = firsthalfline + eachline; //concatenate the broken line with the next line
                 broken = false;
+                cout << "concatenated line" << eachline << endl;
             }
 
             if(eachline == "$") break;
+            if(eachline == "") continue;
 
             char bs = eachline[eachline.size()-1];
             if(bs != 'b' && bs != 's'){             //broken line; must continue
                 broken = true;
                 firsthalfline = eachline;
+                cout << "broken line" << firsthalfline << endl;
                 break;
             }
 

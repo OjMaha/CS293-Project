@@ -86,13 +86,13 @@ void print_all_possibilities(vector <vector<int>> &possibilities){
 }
 
 bool check_cancellations(vector <Order> &orderlist, Order &o, vector <vector <int>> &possibilities){
-    cout << "Hello"<<endl;
+    //cout << "Hello"<<endl;
     for(int i = 0; i < orderlist.size(); i++){
         if(orderlist[i].order_string == o.order_string){
             if(orderlist[i].bs == o.bs){       //combine 2 orders if both buy or both sell
                 int q = orderlist[i].quantity; //old q
                 orderlist[i].quantity += o.quantity;  //new q
-                cout << "Combine!!"<<endl;  
+                //cout << "Combine!!"<<endl;  
                 int s = possibilities.size();
                 for(int j = 0; j < s; j++){   //for all previous possibilities
                     if(possibilities[j][i] == q){
@@ -113,7 +113,7 @@ bool check_cancellations(vector <Order> &orderlist, Order &o, vector <vector <in
                         if(possibilities[l][i] > orderlist[i].quantity) 
                             possibilities[l][i] = -1;        //set all higher values to 0
                     }  
-                    cout << "Cancel and consume!!"<<endl;
+                    //cout << "Cancel and consume!!"<<endl;
                     return true;
 
                 }
@@ -142,14 +142,14 @@ bool check_cancellations(vector <Order> &orderlist, Order &o, vector <vector <in
                         
                     }
                 }
-                cout << "Cancel!!"<<endl;
+                //cout << "Cancel!!"<<endl;
             }
             
             return false;
         }
 
     }
-    cout << "New order!!"<<endl;
+    //cout << "New order!!"<<endl;
     orderlist.push_back(o);
     int n = orderlist.size();
     int qu = o.quantity;
@@ -206,15 +206,15 @@ int main(){
         
         Order o;
         
-        o.order_string = temp.substr(0, temp.size() - 4);
-        o.order_string = strip(o.order_string);
+        //o.order_string = temp.substr(0, temp.size() - 4);
+        //o.order_string = strip(o.order_string);
         
     
         int size = tokens.size();
         if(size <= 1) break;    
         if(tokens[size-1] == "b") o.bs = 'b';
         else o.bs = 's';
-
+        
         o.quantity = stoi(tokens[size-2]);
         o.price = stoi(tokens[size-3]);
         o.price *= o.bs == 'b' ? 1 : -1;   //take everything positive if buy, negative if sell
@@ -226,6 +226,10 @@ int main(){
         }
 
         sort(o.stonklist.begin(), o.stonklist.end());
+        for(int j = 0; j<o.stonklist.size(); j++){
+            o.order_string += o.stonklist[j] + " " + to_string(o.stonks[o.stonklist[j]]) + " ";
+        }
+        o.order_string = strip(o.order_string);
 
         //check for cancellations or combinations
         bool cancelled = check_cancellations(orderlist, o, possibilities);
