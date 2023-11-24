@@ -60,18 +60,64 @@ market::market(int argc, char** argv)
         while(std::getline(ss, line, ' ')) {
             tokens.push_back(line);
         }
-
+        
+        int sz = tokens.size();
         int start_time = stoi(tokens[0]);
         string broker = tokens[1];
         if(tokens[2] == "BUY") tokens[2] = "1";
         else tokens[2] = "-1";
         int bs = stoi(tokens[2]);
-        string stonk = tokens[3];
-        int price = stoi(tokens[4].substr(1)); //remove $ sign
-        int quantity = stoi(tokens[5].substr(1)); //remove # sign
-        int expires_after = stoi(tokens[6]);
+        int price = stoi(tokens[sz-3].substr(1)); //remove $ sign
+        int quantity = stoi(tokens[sz-2].substr(1)); //remove # sign
+        int expires_after = stoi(tokens[sz-1]);
+        //process lincomb as a string
+        string stonk;
+        for(int i = 3; i<sz-3; i++){
+            stonk += (tokens[i] + " ");
+        }
 
-        order o;
+        std::string stock_data_string = stonk;
+
+        std::map<std::string, int> stock_map;
+
+        std::istringstream iss(stock_data_string);
+
+        string token_stonk;
+        vector<string> tokens_stonk;
+
+        // Read stock name and quantity pairs from the stringstream waayon
+        while (iss >> token_stonk) {
+            tokens_stonk.push_back(token_stonk);
+        }
+
+        // Process the stock name and quantity pairs
+        for (int i = 0; i < tokens_stonk.size(); i++) {
+            string stock_name = tokens_stonk[i];
+
+            if(i+1 == tokens_stonk.size()){    //if last token
+                stock_map[stock_name] = 1;      //default quantity is 1
+                break;
+            }
+
+            if(tokens_stonk[i+1][0] - '0' <=9 && tokens_stonk[i+1][0] - '0' >=0){   //if next token is a number
+                int stock_quantity = stoi(tokens_stonk[i + 1]);
+                stock_map[stock_name] = stock_quantity;
+                i++;
+            }
+
+            else{
+                stock_map[stock_name] = 1;      //default quantity is 1
+            }
+        }
+
+        stonk = "";
+        for(auto it = stock_map.begin(); it != stock_map.end(); it++){
+            stonk += (it->first + " " + to_string(it->second) + " ");
+        }
+
+        stonk.pop_back();   //remove last space
+
+        order o;            //initialise order      
 
         o.issue = start_time;
         if(expires_after >= 0){
