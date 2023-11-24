@@ -78,7 +78,7 @@ market::market(int argc, char** argv)
             o.expiry = start_time + expires_after;
         }
         else{
-            o.expiry = -1;      // -1 for infinite expiry
+            o.expiry = -1;      /// -1 for infinite expiry
         }
 
         o.broker = broker;
@@ -108,26 +108,36 @@ market::market(int argc, char** argv)
     // for(int i = 0; i<all_orders.size(); i++){
     //     print_order(all_orders[i]);
     // }
+    // cout<<endl;
+    // for(int i = 0; i<buy_orders.size(); i++){
+    //     print_order(buy_orders[i]);
+    // }
+    // cout<<endl;
+    // for(int i = 0; i<sell_orders.size(); i++){
+    //     print_order(sell_orders[i]);
+    // }
     
 
 }
 
-//note thaat buy_orders, sell_orders and all_orders are sorted by time
+///note thaat buy_orders, sell_orders and all_orders are sorted by time
 
 void market::start()
 {  
     vector<executed_order> executed;
 
     for(int i=0;i<all_orders.size();i++){
-        if(all_orders[i].bs == 1){
+        if(all_orders[i].bs == 1){          //buy order hai
             vector <executed_order> possible_matches;
             for(int j = 0; j< sell_orders.size(); j++){
                 order b = all_orders[i];
                 order s = sell_orders[j];
 
                 if(s.issue > b.issue) break;
+                else if(s.issue == b.issue && get_index(all_orders, s) > i) break; //if s order came after b order, then break
+                else
                 if(valid_orders(b,s) && b.price >= s.price){
-                    
+            
                     executed_order e;
                     e.buyer = b.broker;
                     e.seller = s.broker;
@@ -141,10 +151,10 @@ void market::start()
                 }
             }
 
-            //sort possible matches by price (descending), then quantity(descending), then timestamp(ascending), then stonk alphabetically(ascending)
+            ///sort possible matches by price (ascending), then quantity(descending), then timestamp(ascending), then stonk alphabetically(ascending)
             for(int i = 0; i<possible_matches.size(); i++){
                 for(int j = i+1; j<possible_matches.size(); j++){
-                    if(possible_matches[i].price < possible_matches[j].price){
+                    if(possible_matches[i].price > possible_matches[j].price){
                         swap(possible_matches[i], possible_matches[j]);
                     }
                     else if(possible_matches[i].price == possible_matches[j].price){
@@ -170,32 +180,43 @@ void market::start()
                 }
             }
 
+            // print_matches(possible_matches);
+            // cout<<endl;
             //now execute the matches
-            for(int m = 0; m<possible_matches.size(); i++){
-                executed.push_back(possible_matches[m]);
+            for(int m = 0; m<possible_matches.size(); m++){
                 int j = possible_matches[m].index;
 
-                all_orders[i].quantity -= possible_matches[m].quantity;
-                sell_orders[j].quantity -= possible_matches[m].quantity;
-                buy_orders[indices[i]].quantity -= possible_matches[m].quantity;
+                int qty = min(all_orders[i].quantity, possible_matches[m].quantity);
+                all_orders[i].quantity -= qty;
+                sell_orders[j].quantity -= qty;
+                buy_orders[indices[i]].quantity -= qty;
+                // cout<<"updatebuy";print_all_orders(buy_orders);cout<<endl;
+                // cout<<"updatesell";print_all_orders(sell_orders);cout<<endl;
+                // cout<<"updateall";print_all_orders(all_orders);cout<<endl;
 
-                print_executed_order(possible_matches[m]);
+                executed_order final_order;
+                final_order.buyer = possible_matches[m].buyer;
+                final_order.seller = possible_matches[m].seller;
+                final_order.stonk = possible_matches[m].stonk;
+                final_order.price = possible_matches[m].price;
+                final_order.quantity = qty;
+                executed.push_back(final_order);
+                print_executed_order(final_order);
 
                 if(all_orders[i].quantity == 0) break;  //if buy order is completely executed, move on to next buy order
 
             }
-
-            
             
         }
 
-        else{
+        else{               ///sell order hai
             vector <executed_order> possible_matches;
             for(int j = 0; j< buy_orders.size(); j++){
                 order b = buy_orders[j];
                 order s = all_orders[i];
 
-                if(b.issue >= s.issue) break;    //here equal to as im giving priority to buy orders
+                if(b.issue > s.issue) break;
+                else if(b.issue == s.issue && get_index(all_orders, b) > i) break; //if b order came after s order, then break
                 if(valid_orders(s,b) && b.price >= s.price){
                     
                     executed_order e;
@@ -242,18 +263,29 @@ void market::start()
                 }
             }
 
-             //now execute the matches
+            // print_matches(possible_matches);
+            // cout<<endl;
+
+            //now execute the matches
             for(int m = 0; m<possible_matches.size(); m++){
-                executed.push_back(possible_matches[m]);
                 int j = possible_matches[m].index;
 
-                all_orders[i].quantity -= possible_matches[m].quantity;
-                buy_orders[j].quantity -= possible_matches[m].quantity;
-                sell_orders[indices[i]].quantity -= possible_matches[m].quantity;
+                int qty = min(all_orders[i].quantity, possible_matches[m].quantity);
 
-                print_executed_order(possible_matches[m]);
+                all_orders[i].quantity -= qty;
+                buy_orders[j].quantity -= qty;
+                sell_orders[indices[i]].quantity -= qty;
 
-                if(all_orders[i].quantity == 0) break;  //ifsell order is completely executed, move on to next buy order
+                executed_order final_order;
+                final_order.buyer = possible_matches[m].buyer;
+                final_order.seller = possible_matches[m].seller;
+                final_order.stonk = possible_matches[m].stonk;
+                final_order.price = possible_matches[m].price;
+                final_order.quantity = qty;
+                executed.push_back(final_order);
+                print_executed_order(final_order);
+
+                if(all_orders[i].quantity == 0) break;  ///ifsell order is completely executed, move on to next buy order
 
             }
 
@@ -295,4 +327,12 @@ void market::start()
     for(auto it = broker_stats.begin(); it != broker_stats.end(); it++){
         cout<<it->first<<" bought "<<it->second[0]<<" and sold "<<it->second[1]<<" for a net transfer of $"<<it->second[2]<<endl;
     }
+
+    // cout<<endl;
+    // print_all_orders(all_orders);
+    // cout<<endl;
+    // print_all_orders(buy_orders);
+    // cout<<endl;
+    // print_all_orders(sell_orders);
+    // cout<<endl;
 }

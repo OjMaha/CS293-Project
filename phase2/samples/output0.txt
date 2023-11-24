@@ -82,14 +82,14 @@ TL
 !@
 @!
 Successfully Initiated!
-AA purchased 3 share of AMD from AKG for $242/share
-SM purchased 7 share of NFLX from AKG for $290/share
-OT purchased 11 share of AMD from OT for $271/share
-SM purchased 2 share of GE from AKG for $107/share
-KA purchased 3 share of GE from AKG for $43/share
-SV purchased 9 share of GE from SV for $486/share
-OT purchased 5 share of AMD from AA for $422/share
-AA purchased 1 share of AMD from AA for $242/share
+AA purchased 3 share of AMD from AKG for $242/share     y
+SM purchased 7 share of NFLX from AKG for $290/share    y
+OT purchased 11 share of AMD from OT for $271/share     y
+SM purchased 2 share of GE from AKG for $107/share      y
+KA purchased 3 share of GE from AKG for $43/share       y
+SV purchased 9 share of GE from SV for $486/share       y
+OT purchased 5 share of AMD from AA for $422/share      y
+AA purchased 1 share of AMD from AA for $242/share      n
 SV purchased 3 share of GE from GS for $486/share
 KA purchased 3 share of GE from GS for $337/share
 AA purchased 5 share of AMZN from KG for $166/share

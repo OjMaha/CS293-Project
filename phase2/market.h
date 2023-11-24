@@ -39,6 +39,14 @@ public:
 		return true;
 	}
 
+	int get_index(vector <order> all_orders, order o){
+		for(int i = 0; i < all_orders.size(); i++){
+			if(all_orders[i].stonk == o.stonk && all_orders[i].broker == o.broker && 
+			all_orders[i].price == o.price && all_orders[i].quantity == o.quantity && all_orders[i].issue == o.issue && all_orders[i].expiry == o.expiry && all_orders[i].bs == o.bs) return i;
+		}
+		return -1;
+	}
+
 private:
 };
 #endif
