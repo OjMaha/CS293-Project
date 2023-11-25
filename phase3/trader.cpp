@@ -8,7 +8,10 @@
 #include <string>
 #include <arpa/inet.h>
 #include <pthread.h>
-#include <vector>
+
+#include </home/ojmaha/Desktop/IITB/CS293/CS293-Project/phase3/receiver.h>
+
+using namespace std;
 
 const int BUFFER_SIZE = 1024;
 int NUM_THREADS = 2;
@@ -41,7 +44,7 @@ void *handleClient(void *arg) {
             break;
         } else {
             // Print the received message
-            buffer[bytesRead] = '\0';
+            buffer[bytesRead] = '\0';       // Add the null-terminator
             std::cout << "Received message from client, IP: " << inet_ntoa(clientInfo->address.sin_addr) << ", Port: " << ntohs(clientInfo->address.sin_port) << ": " << buffer << std::endl;
         }
     }

@@ -14,7 +14,41 @@ struct order
     int quantity;
 	int issue;
     int expiry;
-	int bs;				// 1 for buy, -1 for sell 		
+	int bs;				/// 1 for buy, -1 for sell 		
+};
+
+struct sell_order_compare {
+    bool operator()(const order& lhs, const order& rhs) const {
+        // Compare prices in ascending order
+        if (lhs.price != rhs.price) {
+            return lhs.price > rhs.price;
+        }
+
+        // If prices are equal, compare expiry times in ascending order
+        if (lhs.expiry != rhs.expiry) {
+            return lhs.expiry > rhs.expiry;
+        }
+
+        // If both price and expiry time are equal, compare stock names alphabetically
+        return lhs.stonk > rhs.stonk;
+    }
+};
+
+struct buy_order_compare {
+    bool operator()(const order& lhs, const order& rhs) const {
+        // Compare prices in descending order
+        if (lhs.price != rhs.price) {
+            return lhs.price < rhs.price;
+        }
+
+        // If prices are equal, compare expiry times in ascending order
+        if (lhs.expiry != rhs.expiry) {
+            return lhs.expiry > rhs.expiry;
+        }
+
+        // If both price and expiry time are equal, compare stock names alphabetically
+        return lhs.stonk > rhs.stonk;
+    }
 };
 
 class market

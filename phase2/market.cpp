@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <queue>
 using namespace std;
 
 
@@ -38,11 +39,10 @@ void print_all_orders(vector<order> orders){
     }
 }
 
-
 market::market(int argc, char** argv)
 {   
     // Open a file for reading
-    std::ifstream inputFile("./my_input.txt");
+    std::ifstream inputFile("tk_input.txt");
     // Check if the file is open
     if (!inputFile.is_open()) {
         std::cerr << "Error opening the file." << std::endl;
@@ -74,7 +74,7 @@ market::market(int argc, char** argv)
         string stonk;
         for(int i = 3; i<sz-3; i++){
             stonk += (tokens[i] + " ");
-        }
+        }   
 
         std::string stock_data_string = stonk;
 
@@ -112,7 +112,10 @@ market::market(int argc, char** argv)
 
         stonk = "";
         for(auto it = stock_map.begin(); it != stock_map.end(); it++){
-            stonk += (it->first + " " + to_string(it->second) + " ");
+            stonk += (it->first + " ");
+            if(it->second != 1){
+                stonk += (to_string(it->second) + " ");
+            }
         }
 
         stonk.pop_back();   //remove last space
@@ -171,170 +174,100 @@ market::market(int argc, char** argv)
 void market::start()
 {  
     vector<executed_order> executed;
+    map<string, priority_queue<order, vector<order>, buy_order_compare>> buy_map; //stonk name, priority queue of buy orders
+    map<string, priority_queue<order, vector <order>, sell_order_compare>> sell_map; //stonk name, priority queue of sell orders
 
     for(int i=0;i<all_orders.size();i++){
         if(all_orders[i].bs == 1){          //buy order hai
-            vector <executed_order> possible_matches;
-            for(int j = 0; j< sell_orders.size(); j++){
-                order b = all_orders[i];
-                order s = sell_orders[j];
 
-                if(s.issue > b.issue) break;
-                else if(s.issue == b.issue && get_index(all_orders, s) > i) break; //if s order came after b order, then break
-                else
-                if(valid_orders(b,s) && b.price >= s.price){
-            
-                    executed_order e;
-                    e.buyer = b.broker;
-                    e.seller = s.broker;
-                    e.stonk = b.stonk;
-                    e.price = s.price;
-                    e.quantity = min(b.quantity, s.quantity);
-                    e.index = j;
+            if(sell_map.find(all_orders[i].stonk) == sell_map.end()){
+                buy_map[all_orders[i].stonk].push(all_orders[i]);
 
-                    if (e.quantity == 0) continue;
-                    else possible_matches.push_back(e);
+            }
+        
+            else{
+
+                while(sell_map[all_orders[i].stonk].size() > 0 && sell_map[all_orders[i].stonk].top().expiry < all_orders[i].issue){
+                    sell_map[all_orders[i].stonk].pop();  //remove all expired sell orders
+                }
+
+                while(sell_map[all_orders[i].stonk].size() > 0 && sell_map[all_orders[i].stonk].top().price <= all_orders[i].price){
+                    order s = sell_map[all_orders[i].stonk].top();
+                    int qty = min(all_orders[i].quantity, s.quantity);
+                    all_orders[i].quantity -= qty;
+                    s.quantity -= qty;
+                    if(s.quantity == 0) sell_map[all_orders[i].stonk].pop();    //if sell order is completely executed, remove it
+                    //move on to next sell order
+                    else {
+                        sell_map[all_orders[i].stonk].pop();    //else update the quantity of the sell order (essentiallybuy order fully executed)
+                        if(s.quantity > 0) sell_map[all_orders[i].stonk].push(s); //if sell order is not completely executed, push it back into the queue
+                        break;
+                    }
+
+                    buy_orders[indices[i]].quantity -= qty;
+                
+                    executed_order final_order;
+                    final_order.buyer = all_orders[i].broker;
+                    final_order.seller = s.broker;
+                    final_order.stonk = s.stonk;
+                    final_order.price = s.price;
+                    final_order.quantity = qty;
+                    executed.push_back(final_order);
+                    print_executed_order(final_order);
+
+                    if(all_orders[i].quantity == 0) break;  //if buy order is completely executed, move on to next buy order
+
                 }
             }
 
-            ///sort possible matches by price (ascending), then quantity(descending), then timestamp(ascending), then stonk alphabetically(ascending)
-            for(int i = 0; i<possible_matches.size(); i++){
-                for(int j = i+1; j<possible_matches.size(); j++){
-                    if(possible_matches[i].price > possible_matches[j].price){
-                        swap(possible_matches[i], possible_matches[j]);
-                    }
-                    else if(possible_matches[i].price == possible_matches[j].price){
-                        if(possible_matches[i].quantity < possible_matches[j].quantity){
-                            swap(possible_matches[i], possible_matches[j]);
-                        }
-                        else if(possible_matches[i].quantity == possible_matches[j].quantity){
-                            if(possible_matches[i].buyer > possible_matches[j].buyer){
-                                swap(possible_matches[i], possible_matches[j]);
-                            }
-                            else if(possible_matches[i].buyer == possible_matches[j].buyer){
-                                if(possible_matches[i].seller > possible_matches[j].seller){
-                                    swap(possible_matches[i], possible_matches[j]);
-                                }
-                                else if(possible_matches[i].seller == possible_matches[j].seller){
-                                    if(possible_matches[i].stonk > possible_matches[j].stonk){
-                                        swap(possible_matches[i], possible_matches[j]);
-                                    }
-                                } 
-                            }
-                        }
-                    }
-                }
+            if(all_orders[i].quantity > 0){
+                buy_map[all_orders[i].stonk].push(all_orders[i]);
             }
-
-            // print_matches(possible_matches);
-            // cout<<endl;
-            //now execute the matches
-            for(int m = 0; m<possible_matches.size(); m++){
-                int j = possible_matches[m].index;
-
-                int qty = min(all_orders[i].quantity, possible_matches[m].quantity);
-                all_orders[i].quantity -= qty;
-                sell_orders[j].quantity -= qty;
-                buy_orders[indices[i]].quantity -= qty;
-                // cout<<"updatebuy";print_all_orders(buy_orders);cout<<endl;
-                // cout<<"updatesell";print_all_orders(sell_orders);cout<<endl;
-                // cout<<"updateall";print_all_orders(all_orders);cout<<endl;
-
-                executed_order final_order;
-                final_order.buyer = possible_matches[m].buyer;
-                final_order.seller = possible_matches[m].seller;
-                final_order.stonk = possible_matches[m].stonk;
-                final_order.price = possible_matches[m].price;
-                final_order.quantity = qty;
-                executed.push_back(final_order);
-                print_executed_order(final_order);
-
-                if(all_orders[i].quantity == 0) break;  //if buy order is completely executed, move on to next buy order
-
-            }
-            
         }
 
-        else{               ///sell order hai
-            vector <executed_order> possible_matches;
-            for(int j = 0; j< buy_orders.size(); j++){
-                order b = buy_orders[j];
-                order s = all_orders[i];
-
-                if(b.issue > s.issue) break;
-                else if(b.issue == s.issue && get_index(all_orders, b) > i) break; //if b order came after s order, then break
-                if(valid_orders(s,b) && b.price >= s.price){
-                    
-                    executed_order e;
-                    e.buyer = b.broker;
-                    e.seller = s.broker;
-                    e.stonk = b.stonk;
-                    e.price = b.price;
-                    e.index = j;
-                    e.quantity = min(b.quantity, s.quantity);
-
-                    if (e.quantity == 0) continue;
-
-                    else possible_matches.push_back(e);  
-                }
-
+        else{                 //sell order hai
+        if(buy_map.find(all_orders[i].stonk) == buy_map.end()){
+                sell_map[all_orders[i].stonk].push(all_orders[i]);
             }
 
-            //sort possible matches by price (descending), then quantity(descending), then timestamp(ascending), then stonk alphabetically(ascending)
-            for(int i = 0; i<possible_matches.size(); i++){
-                for(int j = i+1; j<possible_matches.size(); j++){
-                    if(possible_matches[i].price < possible_matches[j].price){
-                        swap(possible_matches[i], possible_matches[j]);
+            else{
+
+                while(buy_map[all_orders[i].stonk].size() > 0 && buy_map[all_orders[i].stonk].top().expiry < all_orders[i].issue){
+                    sell_map[all_orders[i].stonk].pop();  //remove all expired sell orders
+                }
+
+                while(buy_map[all_orders[i].stonk].size() > 0 && buy_map[all_orders[i].stonk].top().price <= all_orders[i].price){
+                    order b = buy_map[all_orders[i].stonk].top();
+                    int qty = min(all_orders[i].quantity, b.quantity);
+                    all_orders[i].quantity -= qty;
+                    b.quantity -= qty;
+                    if(b.quantity == 0) buy_map[all_orders[i].stonk].pop();    //if buy order is completely executed, remove it
+                    //move on to next buy order
+                    else {
+                        buy_map[all_orders[i].stonk].pop();    //else update the quantity of the buy order (essentially sell order fully executed)
+                        if(b.quantity > 0) buy_map[all_orders[i].stonk].push(b); //if buy order is not completely executed, push it back into the queue
+                        break;
                     }
-                    else if(possible_matches[i].price == possible_matches[j].price){
-                        if(possible_matches[i].quantity < possible_matches[j].quantity){
-                            swap(possible_matches[i], possible_matches[j]);
-                        }
-                        else if(possible_matches[i].quantity == possible_matches[j].quantity){
-                            if(possible_matches[i].buyer > possible_matches[j].buyer){
-                                swap(possible_matches[i], possible_matches[j]);
-                            }
-                            else if(possible_matches[i].buyer == possible_matches[j].buyer){
-                                if(possible_matches[i].seller > possible_matches[j].seller){
-                                    swap(possible_matches[i], possible_matches[j]);
-                                }
-                                else if(possible_matches[i].seller == possible_matches[j].seller){
-                                    if(possible_matches[i].stonk > possible_matches[j].stonk){
-                                        swap(possible_matches[i], possible_matches[j]);
-                                    }
-                                } 
-                            }
-                        }
-                    }
+
+                    sell_orders[indices[i]].quantity -= qty;
+                
+                    executed_order final_order;
+                    final_order.buyer = all_orders[i].broker;
+                    final_order.seller = b.broker;
+                    final_order.stonk = b.stonk;
+                    final_order.price = b.price;
+                    final_order.quantity = qty;
+                    executed.push_back(final_order);
+                    print_executed_order(final_order);
+
+                    if(all_orders[i].quantity == 0) break;  //if buy order is completely executed, move on to next buy order
+
                 }
             }
 
-            // print_matches(possible_matches);
-            // cout<<endl;
-
-            //now execute the matches
-            for(int m = 0; m<possible_matches.size(); m++){
-                int j = possible_matches[m].index;
-
-                int qty = min(all_orders[i].quantity, possible_matches[m].quantity);
-
-                all_orders[i].quantity -= qty;
-                buy_orders[j].quantity -= qty;
-                sell_orders[indices[i]].quantity -= qty;
-
-                executed_order final_order;
-                final_order.buyer = possible_matches[m].buyer;
-                final_order.seller = possible_matches[m].seller;
-                final_order.stonk = possible_matches[m].stonk;
-                final_order.price = possible_matches[m].price;
-                final_order.quantity = qty;
-                executed.push_back(final_order);
-                print_executed_order(final_order);
-
-                if(all_orders[i].quantity == 0) break;  ///ifsell order is completely executed, move on to next buy order
-
+            if(all_orders[i].quantity > 0){
+                sell_map[all_orders[i].stonk].push(all_orders[i]);
             }
-
             
         }
     }
@@ -373,12 +306,5 @@ void market::start()
     for(auto it = broker_stats.begin(); it != broker_stats.end(); it++){
         cout<<it->first<<" bought "<<it->second[0]<<" and sold "<<it->second[1]<<" for a net transfer of $"<<it->second[2]<<endl;
     }
-
-    // cout<<endl;
-    // print_all_orders(all_orders);
-    // cout<<endl;
-    // print_all_orders(buy_orders);
-    // cout<<endl;
-    // print_all_orders(sell_orders);
-    // cout<<endl;
 }
+

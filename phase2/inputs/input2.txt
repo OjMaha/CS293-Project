@@ -6,3 +6,4 @@ KarGoTravels BUY AMD $150 #25 0
 KarGoExpress SELL AMD $80 #100 -1
 KarGoCorp BUY AMD $120 #10 1
 KarGoKrab BUY GE $110 #10 3
+Meow BUY OJAS $1600 #1 -1 
