@@ -3,16 +3,16 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include "../headers/map.cpp"
+#include "../headers/map_new.cpp"
 #include "../headers/string_extra.cpp"
 #include "../headers/bst.cpp"
-#include <map>
 
 typedef long long ll;
 using namespace std;
 
 struct Order{
-    map<std::string, int> stonks;
+    //map<std::string, int> stonks;
+    CustomMap<std::string, int> stonks2;
     int price = 0;
     char bs = 0;             //'b' for buy, 's' for sell
     bool validity = true; //true if order is valid, false if order is invalid
@@ -53,16 +53,16 @@ void generate_string(vector <string> &possibilities, int size){
 }
 
 //debuging functions
-void print_all_orders(vector <Order> &orderlist){
-    for(int i = 0; i<orderlist.size(); i++){
-        cout<<"order"<<i<<endl;
-        cout << orderlist[i].price << " " << orderlist[i].bs << " ";
-        for(auto it = orderlist[i].stonks.begin(); it != orderlist[i].stonks.end(); it++){
-            cout << it->first << " " << it->second << " ";
-        }
-        cout << endl;
-    }
-}
+// void print_all_orders(vector <Order> &orderlist){
+//     for(int i = 0; i<orderlist.size(); i++){
+//         cout<<"order"<<i<<endl;
+//         cout << orderlist[i].price << " " << orderlist[i].bs << " ";
+//         for(auto it = orderlist[i].stonks.begin(); it != orderlist[i].stonks.end(); it++){
+//             cout << it->first << " " << it->second << " ";
+//         }
+//         cout << endl;
+//     }
+// }
 
 void print_all_possibilities(vector <string> &possibilities){
     for(int i = 0; i<possibilities.size(); i++){
@@ -203,14 +203,16 @@ int main(){
 
             for(int j = 0; j<size-2; j+=2){
                 //insert -ve quantities if selling
-                o.stonks[tokens[j]]= (stoi(tokens[j+1]) * (o.bs == 'b' ? 1 : -1));// * (orderlist[j].bs == 'b' ? 1 : -1));
+                // o.stonks[tokens[j]]= (stoi(tokens[j+1]) * (o.bs == 'b' ? 1 : -1));// * (orderlist[j].bs == 'b' ? 1 : -1));
+                o.stonks2.insert(tokens[j], stoi(tokens[j+1]) * (o.bs == 'b' ? 1 : -1));
                 o.stonklist.push_back(tokens[j]); 
             }
 
             sort(o.stonklist.begin(), o.stonklist.end());
             for(int j = 0; j<o.stonklist.size(); j++){  //make a string of stonks for easy comparison.
                 // only contains stockname quantity stockname quantity
-                o.order_string += o.stonklist[j] + " " + to_string(o.stonks[o.stonklist[j]]) + " ";
+                // o.order_string += o.stonklist[j] + " " + to_string(o.stonks[o.stonklist[j]]) + " ";
+                o.order_string += o.stonklist[j] + " " + to_string(o.stonks2.get(o.stonklist[j])) + " ";
             }
             o.order_string = strip(o.order_string);
 
@@ -244,7 +246,7 @@ int main(){
             //cout << "Checking for arbitrage" << endl;
 
             for(int i = 0; i<m/2; i++){
-                map<string, int> considered_stonks;     //maintain a list of stonks considered for arbitrage with qty
+                CustomMap<string, int> considered_stonks;     //maintain a list of stonks considered for arbitrage with qty
                 int temp_profit = 0;
                 bool flag = true;      //arbitrage checker
 
@@ -252,15 +254,26 @@ int main(){
                 for(int j = 0; j<n; j++){
                     if(possibilities[i][j] == '1'){
                         //considering the jth order
-                        for(auto it = orderlist[j].stonks.begin(); it != orderlist[j].stonks.end(); it++){
+                        // for(auto it = orderlist[j].stonks.begin(); it != orderlist[j].stonks.end(); it++){
+                        //     //considering the kth stonk
+                        //     if(considered_stonks.find(it->first) == considered_stonks.end()){
+                        //         //if stonk not found in considered_stonks
+                        //         considered_stonks[it->first] = it->second;
+                        //     }
+                        //     else{
+                        //         //if stonk found in considered_stonks
+                        //         considered_stonks[it->first] += it->second;
+                        //     }
+                        // }
+
+                        vector<string> keys_to_iterate = orderlist[j].stonks2.getAllKeys();
+                        for(int k = 0; k<keys_to_iterate.size(); k++){
                             //considering the kth stonk
-                            if(considered_stonks.find(it->first) == considered_stonks.end()){
-                                //if stonk not found in considered_stonks
-                                considered_stonks[it->first] = it->second;
+                            if(considered_stonks.contains(keys_to_iterate[k])){ //if stonk found in considered_stonks
+                                considered_stonks.set(keys_to_iterate[k], considered_stonks.get(keys_to_iterate[k]) + orderlist[j].stonks2.get(keys_to_iterate[k]));
                             }
-                            else{
-                                //if stonk found in considered_stonks
-                                considered_stonks[it->first] += it->second;
+                            else{  //if stonk not found in considered_stonks
+                                considered_stonks.insert(keys_to_iterate[k], orderlist[j].stonks2.get(keys_to_iterate[k]));
                             }
                         }
 
@@ -270,8 +283,16 @@ int main(){
 
                 //check if total qty of all stonks become zero
 
-                for(auto it = considered_stonks.begin(); it != considered_stonks.end(); it++){
-                    if(it->second != 0){
+                // for(auto it = considered_stonks.begin(); it != considered_stonks.end(); it++){
+                //     if(it->second != 0){
+                //         flag = false;
+                //         break;
+                //     }
+                // }
+
+                vector <string> keys_for_considered_stonks = considered_stonks.getAllKeys();
+                for(int j = 0; j<keys_for_considered_stonks.size(); j++){
+                    if(considered_stonks.get(keys_for_considered_stonks[j]) != 0){
                         flag = false;
                         break;
                     }
@@ -308,8 +329,12 @@ int main(){
                     if(possibilities[possibility_number][j] == '1'){
                         int multiplier = 1;
                         if(orderlist[j].bs == 's') multiplier = -1;
-                        for(auto it = orderlist[j].stonks.begin(); it != orderlist[j].stonks.end(); it++){
-                                cout << it->first  << " " << it->second * multiplier << " ";
+                        // for(auto it = orderlist[j].stonks.begin(); it != orderlist[j].stonks.end(); it++){
+                        //         cout << it->first  << " " << it->second * multiplier << " ";
+                        // }
+                        vector<string> keys_to_iterate_print = orderlist[j].stonks2.getAllKeys();
+                        for(int k = 0; k<keys_to_iterate_print.size(); k++){
+                            cout << keys_to_iterate_print[k]  << " " << orderlist[j].stonks2.get(keys_to_iterate_print[k]) * multiplier << " ";
                         }
 
                         cout << orderlist[j].price << " ";
