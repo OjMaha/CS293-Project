@@ -62,7 +62,7 @@ int main() {
         //first check for cancellations
         else if(rejected.contains(stock) == true && rejected[stock].search(pp*(-1)) == true){
                 rejected[stock].remove(pp);
-                cout << "No trade"<<endl;
+                cout << "No Trade"<<endl;
         }
 
         //not cancelled, so check for trade
@@ -91,7 +91,7 @@ int main() {
                 rejected[stock].insert(pp,0);
             }
             
-            cout<<"No trade"<<endl;
+            cout<<"No Trade"<<endl;
 
             
         }

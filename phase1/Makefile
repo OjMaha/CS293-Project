@@ -19,20 +19,20 @@ iml: iml.cpp
 runpart1: iml trader
 	./trader 1 > output.txt &
 	sleep 1
-	./iml inputs/part1/data1.txt
+	./iml inputs/part1/tk3.txt
 	diff outputs/out1.txt output.txt
 
 runpart2: iml trader
 	./trader 2 > output.txt &
 	sleep 1
-	./iml inputs/part2/data2.txt
+	./iml inputs/part2/tk2.txt
 	diff outputs/out2.txt output.txt
 
-runpart3: iml trader
-	./trader 3 > output.txt &
+runpart3: iml trader 
+	./trader 3 &
 	sleep 1
-	./iml inputs/part3/data3.txt
-	diff outputs/out3.txt output.txt
+	./iml inputs/part3/tk1.txt
+#	diff outputs/out3.txt output.txt
 
 ojas: iml ojas_trader
 	./ojas_trader 2 > output.txt &

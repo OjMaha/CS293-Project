@@ -80,7 +80,7 @@ bool check_cancellations(vector <Order> &orderlist, Order &o, CustomMap2<std::st
         }
         else if(o.price <= buyMap.get(o.order_string).price){ //price <= best rejected buy price
             o.validity = false;
-            cout << "No trade" << endl;
+            cout << "No Trade" << endl;
             return true;
         }
         else{
@@ -96,7 +96,7 @@ bool check_cancellations(vector <Order> &orderlist, Order &o, CustomMap2<std::st
         }
         else if(o.price <= sellMap.get(o.order_string).price){ //price >= best rejected sell price
             o.validity = false;
-            cout << "No trade" << endl;
+            cout << "No Trade" << endl;
             return true;
         }
         else{
@@ -362,17 +362,20 @@ void part2(){
                     total_profit += profit;
             }
 
-            else cout <<"No trade"<<endl;
+            else cout <<"No Trade"<<endl;
             // cout<<"baadme: "; print_all_possibilities (possibilities);
 
         }
             
         if(eachline == "$"){
             //cout << "I'm Done here bro" << endl;            
-            break;
+            rcv.terminate();
+            return;
         }
         
     }
+    rcv.terminate();
+    return;
         
         
 

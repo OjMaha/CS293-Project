@@ -362,7 +362,7 @@ int main(){
                 total_profit += profit;
         }
 
-        else cout <<"No trade"<<endl;
+        else cout <<"No Trade"<<endl;
         // cout<<"baadme: "; print_all_possibilities (possibilities);
 
     }

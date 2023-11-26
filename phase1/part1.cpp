@@ -39,11 +39,22 @@ namespace Part1{
                     broken = false;
                     //std::cout << "concatenated line" << eachline << std::endl;
                 }
+                eachline = strip(eachline);
 
-                if(eachline == "$") return;
+                //std::cout << std::endl;
+                //std::cout << eachline << std::endl;
+
+                if(eachline == "$") {
+                    rcv.terminate();
+                    return;
+                }
                 if(eachline == ""){
                     chutiyapa++;
-                    if(chutiyapa >= 10) return; //to avoid weird infinite loops
+                    if(chutiyapa >= 10) {
+                        rcv.terminate();
+                        return;
+                    } //to avoid weird infinite loops
+                    continue;
                 }
 
                 char bs1 = eachline[eachline.size()-1];
@@ -53,8 +64,7 @@ namespace Part1{
                     //std::cout << "broken line" << firsthalfline << std::endl;
                     break;
                 }
-                std::cout << std::endl;
-                std::cout << eachline << std::endl;
+                
                 
                 int k = 0; //k is counter used to maintain which part of the std::string is being read (stock, price, b/s)
                 std::string stock;
@@ -96,7 +106,7 @@ namespace Part1{
                         else if(p > buyMap.get(stock))
                             buyMap.set(stock, p);
                         else{
-                            std::cout << "No trade" << std::endl;   //cancelled
+                            std::cout << "No Trade" << std::endl;   //cancelled
                             continue;
                         }
 
@@ -107,20 +117,20 @@ namespace Part1{
                         else if(p < sellMap.get(stock))
                             sellMap.set(stock, p);
                         else{
-                            std::cout << "No trade" << std::endl;   //cancelled
+                            std::cout << "No Trade" << std::endl;   //cancelled
                             continue;
                         }
                     }
 
                     
                     if(bs == "b" && p == sellMap.get(stock) && sellMap.contains(stock)){ //if buy offer is equal to best rejected sell price
-                        std::cout<<"No trade"<<std::endl;
+                        std::cout<<"No Trade"<<std::endl;
                         sellMap.remove(stock);
                         buyMap.remove(stock);
                         continue;
                     }
                     else if(bs == "s" && p == buyMap.get(stock) && buyMap.contains(stock)){ //if sell offer is equal to best rejected buy price
-                        std::cout<<"No trade"<<std::endl;
+                        std::cout<<"No Trade"<<std::endl;
                         sellMap.remove(stock);
                         buyMap.remove(stock);
                         continue;
@@ -140,7 +150,7 @@ namespace Part1{
                             if(buyMap.get(stock) < p || buyMap.contains(stock) == false){
                                 buyMap.set(stock, p);
                             }
-                            std::cout<<"No trade"<<std::endl;
+                            std::cout<<"No Trade"<<std::endl;
                             continue;
                         }
                     }
@@ -156,7 +166,7 @@ namespace Part1{
                             if(sellMap.get(stock) > p || sellMap.contains(stock) == false){
                                 sellMap.set(stock, p);
                             }
-                            std::cout<<"No trade"<<std::endl;
+                            std::cout<<"No Trade"<<std::endl;
                             continue;
                         }
                     }
@@ -169,10 +179,12 @@ namespace Part1{
             }
 
             if(eachline == "$"){
+                rcv.terminate();
                 return;
             }
 
         }
+        rcv.terminate();
         return;
     }
 
@@ -191,7 +203,7 @@ namespace Part1{
 
                     else{
                         buyMap.remove(stock);
-                        std::cout<<"No trade"<<std::endl;
+                        std::cout<<"No Trade"<<std::endl;
                     }
                 }
                 else if(p_i > p && bs=="s" && (p < buyMap.get(stock) || buyMap.contains(stock) == false) ){
@@ -202,7 +214,7 @@ namespace Part1{
                     }
                     else{
                         sellMap.remove(stock);
-                        std::cout<<"No trade"<<std::endl;
+                        std::cout<<"No Trade"<<std::endl;
                     }
 
                 }
@@ -217,7 +229,7 @@ namespace Part1{
                             buyMap.set(stock,p);
                         }
                     }
-                    std::cout<<"No trade"<<std::endl;
+                    std::cout<<"No Trade"<<std::endl;
                 }
             }
 

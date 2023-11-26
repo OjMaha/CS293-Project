@@ -71,7 +71,7 @@ int main() {
         //first check for cancellations
         else if(rejected.contains(stock) == true && rejected[stock].search(pp) == true){
                 rejected[stock].remove(pp);
-                cout << "No trade";
+                cout << "No Trade";
         }
 
         //not cancelled, so check for trade
@@ -100,7 +100,7 @@ int main() {
                 rejected[stock].insert(pp,0);
             }
             
-            cout<<"No trade"<<endl;
+            cout<<"No Trade"<<endl;
 
             
         }
@@ -156,7 +156,7 @@ int main() {
 //             //cout<<"tryna";
 //             if (temp.search(pp) == true){
 //                 // cout<<"cancelled"<<endl;
-//                 // cout<<"No trade"<<endl;
+//                 // cout<<"No Trade"<<endl;
 //                 temp.remove(pp);
 //                 rejected[stock] = temp;
 //             }
@@ -193,7 +193,7 @@ int main() {
 //                     //cout<<"insertin"<<pp<<endl;
 //                 }
                 
-//                 cout<<"No trade"<<endl;
+//                 cout<<"No Trade"<<endl;
 
                 
 //             }
