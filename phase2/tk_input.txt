@@ -15,8 +15,35 @@ TL
 6 KarGoCorp BUY AMD $120 #10 1
 7 KarGoCorp SELL GE $50 #15 -1
 7 KarGoKrab BUY GE $110 #10 3
-8 Meow SELL OJAS $1500 #1 -1 
-8 Meow BUY OJAS $1600 #1 -1 
 !@
 @!
 Successfully Initiated!
+SM purchased 2 share of GE from AKG for $107/share
+KA purchased 3 share of GE from AKG for $43/share
+SV purchased 9 share of GE from SV for $486/share
+SV purchased 3 share of GE from GS for $486/share
+KA purchased 3 share of GE from GS for $337/share
+SV purchased 5 share of GE from SM for $87/share
+SM purchased 3 share of GE from KG for $35/share
+SM purchased 7 share of GE from GS for $138/share
+AKG purchased 3 share of GE from GS for $138/share
+AKG purchased 12 share of GE from AKG for $211/share
+OT purchased 4 share of GE from KG for $290/share
+OT purchased 6 share of GE from OT for $290/share
+KA purchased 3 share of GE from OT for $284/share
+SV purchased 6 share of GE from OT for $99/share
+SV purchased 8 share of GE from SV for $300/share
+SM purchased 6 share of GE from OT for $29/share
+SM purchased 1 share of GE from AKG for $30/share
+
+---End of Day---
+Total Amount of Money Transferred: $18588
+Number of Completed Trades: 17
+Number of Shares Traded: 84
+AKG bought 15 and sold 18 for a net transfer of $-41
+GS bought 0 and sold 16 for a net transfer of $3849
+KA bought 9 and sold 0 for a net transfer of $-1992
+KG bought 0 and sold 7 for a net transfer of $1265
+OT bought 10 and sold 21 for a net transfer of $460
+SM bought 19 and sold 5 for a net transfer of $-1054
+SV bought 31 and sold 17 for a net transfer of $-2487

@@ -4,7 +4,7 @@ def process_file(input_file):
         lines = file.readlines()
 
     # Filter lines based on conditions
-    filtered_lines = [line for line in lines if '$' not in line or 'NFLX' in line]
+    filtered_lines = [line for line in lines if '$' not in line or 'GE' in line]
 
     # Write the modified content back to the input file
     with open(input_file, 'w') as file:
@@ -12,7 +12,7 @@ def process_file(input_file):
 
 if __name__ == "__main__":
     # Specify the input file path
-    input_file_path = "./my_input.txt"  # Change this to your actual file path
+    input_file_path = "./output.txt"  # Change this to your actual file path
 
     try:
         # Process the file

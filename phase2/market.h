@@ -24,13 +24,17 @@ struct sell_order_compare {
             return lhs.price > rhs.price;
         }
 
+        if(lhs.expiry == -1 && rhs.expiry == -1) return lhs.broker > rhs.broker;
+        if(lhs.expiry == -1) return true;
+        if(rhs.expiry == -1) return false;
+
         // If prices are equal, compare expiry times in ascending order
         if (lhs.expiry != rhs.expiry) {
             return lhs.expiry > rhs.expiry;
         }
 
-        // If both price and expiry time are equal, compare stock names alphabetically
-        return lhs.stonk > rhs.stonk;
+        // If both price and expiry time are equal, compare broker names alphabetically
+        return lhs.broker > rhs.broker;
     }
 };
 
@@ -41,13 +45,17 @@ struct buy_order_compare {
             return lhs.price < rhs.price;
         }
 
+        if(lhs.expiry == -1 && rhs.expiry == -1) return lhs.broker > rhs.broker;
+        if(lhs.expiry == -1) return true;
+        if(rhs.expiry == -1) return false;
+        
         // If prices are equal, compare expiry times in ascending order
         if (lhs.expiry != rhs.expiry) {
             return lhs.expiry > rhs.expiry;
         }
 
-        // If both price and expiry time are equal, compare stock names alphabetically
-        return lhs.stonk > rhs.stonk;
+        // If both price and expiry time are equal, compare broker names alphabetically
+        return lhs.broker > rhs.broker;
     }
 };
 
