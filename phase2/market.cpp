@@ -6,6 +6,8 @@
 #include <sstream>
 #include <map>
 #include <queue>
+#include "pq_buy.cpp"
+#include "pq_sell.cpp"
 using namespace std;
 
 
@@ -15,9 +17,9 @@ struct executed_order{
     string stonk;
     int price;
     int quantity;
-    int index;
 };
 
+    
 void print_order(order o){
     cout << "issue time:"<<o.issue << " " <<"broker:"<< o.broker << " " <<"BS"<< o.bs << " " << o.stonk 
     << " " <<"price"<< o.price << " " << "quantity"<<o.quantity << " " <<"expiresat:"<< o.expiry << endl;

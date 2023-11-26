@@ -18,32 +18,52 @@ TL
 !@
 @!
 Successfully Initiated!
+AA purchased 3 share of AMD from AKG for $242/share
+SM purchased 7 share of NFLX from AKG for $290/share
+OT purchased 11 share of AMD from OT for $271/share
 SM purchased 2 share of GE from AKG for $107/share
 KA purchased 3 share of GE from AKG for $43/share
 SV purchased 9 share of GE from SV for $486/share
+OT purchased 5 share of AMD from AA for $422/share
+AA purchased 1 share of AMD from AA for $242/share
 SV purchased 3 share of GE from GS for $486/share
 KA purchased 3 share of GE from GS for $337/share
+AA purchased 5 share of AMZN from KG for $166/share
+AA purchased 7 share of AMZN from KA for $379/share
+AA purchased 4 share of AMD from GS for $242/share
+SV purchased 1 share of AMD from GS for $200/share
+SM purchased 4 share of AMD from GS for $192/share
+AA purchased 2 share of AMZN from SV for $379/share
+SV purchased 7 share of AMZN from SV for $350/share
 SV purchased 5 share of GE from SM for $87/share
+KA purchased 3 share of NFLX from KA for $350/share
 SM purchased 3 share of GE from KG for $35/share
 SM purchased 7 share of GE from GS for $138/share
+KA purchased 9 share of NFLX from AA for $459/share
 AKG purchased 3 share of GE from GS for $138/share
 AKG purchased 12 share of GE from AKG for $211/share
+OT purchased 3 share of AAPL from GS for $377/share
+KA purchased 13 share of AMD from OT for $354/share
+SM purchased 1 share of AMD from SV for $297/share
+OT purchased 2 share of AAPL from SM for $380/share
 OT purchased 4 share of GE from KG for $290/share
 OT purchased 6 share of GE from OT for $290/share
 KA purchased 3 share of GE from OT for $284/share
+SM purchased 5 share of AMZN from AKG for $111/share
 SV purchased 6 share of GE from OT for $99/share
 SV purchased 8 share of GE from SV for $300/share
 SM purchased 6 share of GE from OT for $29/share
 SM purchased 1 share of GE from AKG for $30/share
 
 ---End of Day---
-Total Amount of Money Transferred: $18588
-Number of Completed Trades: 17
-Number of Shares Traded: 84
-AKG bought 15 and sold 18 for a net transfer of $-41
-GS bought 0 and sold 16 for a net transfer of $3849
-KA bought 9 and sold 0 for a net transfer of $-1992
-KG bought 0 and sold 7 for a net transfer of $1265
-OT bought 10 and sold 21 for a net transfer of $460
-SM bought 19 and sold 5 for a net transfer of $-1054
-SV bought 31 and sold 17 for a net transfer of $-2487
+Total Amount of Money Transferred: $47830
+Number of Completed Trades: 36
+Number of Shares Traded: 177
+AA bought 22 and sold 15 for a net transfer of $306
+AKG bought 15 and sold 33 for a net transfer of $3270
+GS bought 0 and sold 28 for a net transfer of $6916
+KA bought 34 and sold 10 for a net transfer of $-8072
+KG bought 0 and sold 12 for a net transfer of $2095
+OT bought 31 and sold 45 for a net transfer of $1061
+SM bought 36 and sold 7 for a net transfer of $-3944
+SV bought 39 and sold 27 for a net transfer of $-1632
