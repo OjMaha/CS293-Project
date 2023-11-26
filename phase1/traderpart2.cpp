@@ -17,6 +17,12 @@ struct Order{
     char bs = 0;             //'b' for buy, 's' for sell
     bool validity = true; //true if order is valid, false if order is invalid
     vector <string> stonklist; //maintain a list of stocks involved in an order
+    string order_string = ""; //maintain a string of order for easy comparison
+};
+
+struct Cancellations{
+    int price = 0;
+    int order_index = -1;
 };
 
 //document this pwease
@@ -64,11 +70,71 @@ void print_all_possibilities(vector <string> &possibilities){
     }
 }
 
+bool check_cancellations(vector <Order> &orderlist, Order &o, CustomMap<std::string, Cancellations> &buyMap, CustomMap<std::string, Cancellations> &sellMap, int n){
+    if(o.bs == 'b'){ // buy order
+        if(!buyMap.contains(o.order_string)){
+            buyMap.insert(o.order_string, {o.price, n});
+        }
+        else if(o.price <= buyMap.get(o.order_string).price){ //price <= best rejected buy price
+            o.validity = false;
+            cout << "No trade" << endl;
+            return true;
+        }
+        else{
+            int i = buyMap.get(o.order_string).order_index;
+            buyMap.set(o.order_string, {o.price, n});        //update best rejected buy price
+            orderlist[i].price = o.price;                    //update best rejected buy price in orderlist
+            return false;
+        }
+    }
+    else{   //sell order, for sell order prices are negative, remember
+        if(!sellMap.contains(o.order_string)){
+            sellMap.insert(o.order_string, {o.price, n});
+        }
+        else if(o.price <= sellMap.get(o.order_string).price){ //price >= best rejected sell price
+            o.validity = false;
+            cout << "No trade" << endl;
+            return true;
+        }
+        else{
+            int i = sellMap.get(o.order_string).order_index;
+            sellMap.set(o.order_string, {o.price, n});        //update best rejected sell price
+            orderlist[i].price = o.price;                    //update best rejected sell price in orderlist
+            return false;
+        }
+    }
+
+
+    //now let's check for exact matches
+
+    if(o.bs == 'b' && o.price == (-1 * sellMap.get(o.order_string).price)){  // exact match found
+        cout << "No Trade" << endl;
+        sellMap.remove(o.order_string);
+        buyMap.remove(o.order_string);
+        return true;
+    }
+    else if(o.bs == 's' && (-1*o.price) == buyMap.get(o.order_string).price){  // exact match found
+        cout << "No Trade" << endl;
+        sellMap.remove(o.order_string);
+        buyMap.remove(o.order_string);
+        return true;
+    }
+
+    orderlist.push_back(o); //order is valid, add it to orderlist
+
+    //no more cancellation criteria, ig?
+    return false;
+
+}
+
 int main(){
     vector <string> possibilities;
     generate_string(possibilities, 0);
     vector <Order> orderlist;
     int total_profit = 0;
+
+    CustomMap<std::string, Cancellations> buyMap;    //gonna store stock name and best (highest) rejected buy price 
+    CustomMap<std::string, Cancellations> sellMap;   //gonna store stock name and best (lowest) rejected sell price 
 
     Receiver rcv;
     string firsthalfline;
@@ -76,22 +142,29 @@ int main(){
 
     
 
-    sleep(5);
+    
     while(true){
+        sleep(5);
         std::string message = rcv.readIML();
     
         // Create a stringstream from the input string
         std::istringstream ss(message);
         std::string eachline;
         
+        
 
         // Split the string using the delimiter '#'
         while (std::getline(ss, eachline, '#')) {
+            //cout << "Meow says " << eachline << endl;
+            
+            
             if(broken){
                 eachline = firsthalfline + eachline; //concatenate the broken line with the next line
                 broken = false;
                 //cout << "concatenated line" << eachline << endl;
             }
+            eachline = strip(eachline);
+            //cout << "eachline: " << eachline << endl;
 
             if(eachline == "$"){
                 cout<<total_profit<<endl;
@@ -135,8 +208,24 @@ int main(){
             }
 
             sort(o.stonklist.begin(), o.stonklist.end());
-        
-            orderlist.push_back(o);
+            for(int j = 0; j<o.stonklist.size(); j++){  //make a string of stonks for easy comparison.
+                // only contains stockname quantity stockname quantity
+                o.order_string += o.stonklist[j] + " " + to_string(o.stonks[o.stonklist[j]]) + " ";
+            }
+            o.order_string = strip(o.order_string);
+
+            //cout << "Yet Another trade " << o.order_string << endl;
+
+            //Created an order
+            //Let's check for cancellations
+
+            //bool cancelled = false;
+            bool cancelled = check_cancellations(orderlist, o, buyMap, sellMap, orderlist.size());
+            //cout << "Checked for cancellations" << endl;
+            if(cancelled) continue;
+
+            //Order hasnt been cancelled; let's check for arbitrage
+            //orderlist.push_back(o);
             
 
             //now arbitrage checker
@@ -151,6 +240,8 @@ int main(){
 
             int profit = 0;
             int possibility_number = -1;
+
+            //cout << "Checking for arbitrage" << endl;
 
             for(int i = 0; i<m/2; i++){
                 map<string, int> considered_stonks;     //maintain a list of stonks considered for arbitrage with qty
@@ -211,28 +302,7 @@ int main(){
                     }
                 }
 
-                //check if any order is getting cancelled
-                for(int i = 0; i<order_indices.size()-1; i++){
-                    for (int j = i+1; j<order_indices.size(); j++){
-                        bool flag = false;
-
-                        if (orderlist[order_indices[i]].stonklist.size() == orderlist[order_indices[j]].stonklist.size() 
-                        && std::equal(orderlist[order_indices[i]].stonklist.begin(), orderlist[order_indices[i]].stonklist.end(), 
-                        orderlist[order_indices[j]].stonklist.begin())) flag = true;
-
-                        if(orderlist[order_indices[i]].price == orderlist[order_indices[j]].price *(-1) 
-                        && flag && orderlist[order_indices[i]].bs != orderlist[order_indices[j]].bs){   //one should be negation of other,
-                            //cout<<"cancekl";                                                          //one buy other sell
-                            for(int k = 0; k<possibilities.size(); k++) {
-                                possibilities[k][order_indices[j]] = '0';
-                                possibilities[k][order_indices[i]] = '0';
-                            }
-                        }
-
-                        else flag = false;
-                    }
-                }
-                //it makes canceled orders 0 in all possibilities
+                
 
                 for(int j = n-1; j>=0; j--){        //reverse orderprint
                     if(possibilities[possibility_number][j] == '1'){
@@ -251,7 +321,14 @@ int main(){
                 }
 
                 for(int k = 0; k<order_indices.size(); k++){       //never to be considered again
-                    for(int l = 0; l<possibilities.size(); l++) possibilities[l][order_indices[k]] = '0';       
+                    for(int l = 0; l<possibilities.size(); l++) possibilities[l][order_indices[k]] = '0';
+                    Order ord = orderlist[order_indices[k]];
+
+                    //if the order getting executed was the best order, delete that best order from database
+                    if(ord.bs == 'b' && buyMap.get(ord.order_string).order_index == order_indices[k]) 
+                        buyMap.remove(ord.order_string);
+                    else if(ord.bs == 's' && sellMap.get(ord.order_string).order_index == order_indices[k]) 
+                        buyMap.remove(ord.order_string);
                 }
 
                     total_profit += profit;
@@ -260,16 +337,40 @@ int main(){
             else cout <<"No trade"<<endl;
             // cout<<"baadme: "; print_all_possibilities (possibilities);
 
-            }
-            
-            if(eachline == "$"){
-                //cout << "I'm Done here bro" << endl;
-                
-                break;
-            }
-            
         }
+            
+        if(eachline == "$"){
+            //cout << "I'm Done here bro" << endl;            
+            break;
+        }
+        
+    }
         
         
 
 }
+
+
+
+//check if any order is getting cancelled
+                /*for(int i = 0; i<order_indices.size()-1; i++){
+                    for (int j = i+1; j<order_indices.size(); j++){
+                        bool flag = false;
+
+                        if (orderlist[order_indices[i]].stonklist.size() == orderlist[order_indices[j]].stonklist.size() 
+                        && std::equal(orderlist[order_indices[i]].stonklist.begin(), orderlist[order_indices[i]].stonklist.end(), 
+                        orderlist[order_indices[j]].stonklist.begin())) flag = true;
+
+                        if(orderlist[order_indices[i]].price == orderlist[order_indices[j]].price *(-1) 
+                        && flag && orderlist[order_indices[i]].bs != orderlist[order_indices[j]].bs){   //one should be negation of other,
+                            //cout<<"cancekl";                                                          //one buy other sell
+                            for(int k = 0; k<possibilities.size(); k++) {
+                                possibilities[k][order_indices[j]] = '0';
+                                possibilities[k][order_indices[i]] = '0';
+                            }
+                        }
+
+                        else flag = false;
+                    }
+                }*/
+                //it makes canceled orders 0 in all possibilities
