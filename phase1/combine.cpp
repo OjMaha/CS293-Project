@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     else if(strcmp(argv[1], "2") == 0)
         Part2::part2();
     else if(strcmp(argv[1], "3") == 0){
-        cout << "Combine" << endl;
+        // cout << "Combine" << endl;
         Part3::part3();
-        cout << "Combine done" << endl;
+        // cout << "Combine done" << endl;
     }
         
     

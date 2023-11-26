@@ -165,13 +165,8 @@ bool check_cancellations(vector <Order> &orderlist, Order &o, vector <vector <in
     return false;
 }
 
-
-
-
-
-
 void part3(){
-    cout << "Part 333333" << endl;
+    // cout << "Part 333333" << endl;
     vector <vector<int>> possibilities;
     generate_string(possibilities, 0, 0);
     vector <Order> orderlist;
@@ -182,7 +177,7 @@ void part3(){
     Receiver rcv;
     
     while(true){
-        cout << "MEOWWWW" << endl;
+        // cout << "MEOWWWW" << endl;
         sleep(5);
         std::string message = rcv.readIML();
     
@@ -197,11 +192,11 @@ void part3(){
             // cout << endl;
             // cout << endl;
             // cout << "Meow says " << eachline << endl;
-            cout << "MEOWWWW" << endl;
-            print_all_orders(orderlist);
+            // cout << "MEOWWWW" << endl;
+            // print_all_orders(orderlist);
             // cout << endl;
-            cout << possibilities.size() << " " << orderlist.size() << endl;
-            print_all_possibilities(possibilities);
+            // cout << possibilities.size() << " " << orderlist.size() << endl;
+            // print_all_possibilities(possibilities);
             
             
             
@@ -341,7 +336,7 @@ void part3(){
                         flag = false;
                         break;
                     }
-                    cout << keys_for_considered_stonks[j] << " " << considered_stonks.get(keys_for_considered_stonks[j]) << endl;
+                    //cout << keys_for_considered_stonks[j] << " " << considered_stonks.get(keys_for_considered_stonks[j]) << endl;
                 }
 
                 //cout<<"flag: "<<flag<<endl;

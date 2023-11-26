@@ -29,9 +29,9 @@ runpart2: iml trader
 	diff outputs/out2.txt output.txt
 
 runpart3: iml trader 
-	./trader 3 &
+	./trader 3 >output.txt &
 	sleep 1
-	./iml inputs/part3/tk1.txt
+	./iml inputs/part3/tk2.txt
 #	diff outputs/out3.txt output.txt
 
 ojas: iml ojas_trader
