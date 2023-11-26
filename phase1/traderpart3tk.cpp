@@ -66,11 +66,12 @@ void generate_string(vector <vector <int>> &possibilities, int size, int quantit
 //debuging functions
 void print_all_orders(vector <Order> &orderlist){
     for(int i = 0; i<orderlist.size(); i++){
-        cout<<"order"<<i<<endl;
-        cout << orderlist[i].price << " " << orderlist[i].bs << " ";
-        for(auto it = orderlist[i].stonks.begin(); it != orderlist[i].stonks.end(); it++){
-            cout << it->first << " " << it->second << " ";
-        }
+        cout<<"order"<<i << " ";
+        cout << orderlist[i].order_string << " ";
+        //cout << orderlist[i].price * (orderlist[i].bs == 'b' ? 1 : -1) << " ";
+        cout << orderlist[i].quantity << " ";
+        cout << orderlist[i].bs;
+        
         cout << endl;
     }
 }
@@ -111,7 +112,7 @@ bool check_cancellations(vector <Order> &orderlist, Order &o, vector <vector <in
                     //parse through possibiliities to make new possibilities
                     for(int l = 0; l<possibilities.size(); l++){
                         if(possibilities[l][i] > orderlist[i].quantity) 
-                            possibilities[l][0] = -1;        //set all higher values to 0
+                            possibilities[l][i] = 0;        //set all higher values to 0
                     }  
                     //cout << "Cancel and consume!!"<<endl;
                     return true;
@@ -126,7 +127,7 @@ bool check_cancellations(vector <Order> &orderlist, Order &o, vector <vector <in
                     if(q >= o.quantity){                                //possibilities already exist, just remove the higher values
                         for(int l = 0; l<possibilities.size(); l++){
                             if(possibilities[l][i] > orderlist[i].quantity) 
-                                possibilities[l][0] = -1;        //set all higher values to -1
+                                possibilities[l][i] = 0;        //set all higher values to -1
                         }  
                     }
                     else{                                               //possibilities don't exist, add new strings
@@ -187,7 +188,13 @@ int main(){
 
         // Split the string using the delimiter '#'
         while (std::getline(ss, eachline, '#')) {
-            //cout << "Meow says " << eachline << endl;
+            // cout << endl;
+            // cout << endl;
+            // cout << "Meow says " << eachline << endl;
+            // print_all_orders(orderlist);
+            // cout << endl;
+            // print_all_possibilities(possibilities);
+            
             
             
             if(broken){
@@ -270,7 +277,6 @@ int main(){
             int possibility_number = -1;
 
             for(int i = 0; i<m; i++){
-                if(possibilities[i][0] == -1) continue; //if first element is -1, then it is not a valid possibility
                 map<string, int> considered_stonks;     //maintain a list of stonks considered for arbitrage with qty
                 int temp_profit = 0;
                 bool flag = true;      //arbitrage checker
@@ -361,7 +367,7 @@ int main(){
                         if(possibilities[l][order_indices[k]] > order_quantities[k]) 
                             possibilities[l][order_indices[k]] -= order_quantities[k]; //decrease all the quantities
                         else
-                            possibilities[l][0] = -1;                    //make it -1 if less than quantity
+                            possibilities[l][order_indices[k]] = 0;                    //make it -1 if less than quantity
                     }     
                 }
 
