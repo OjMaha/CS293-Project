@@ -4,7 +4,7 @@
 using namespace std;
 
 template <typename K, typename V>
-class CustomMap {
+class CustomMap2 {
 public:
     class Node {
     public:
@@ -204,13 +204,13 @@ private:
 };
 
 // int main() {
-//     CustomMap<float, string> customMap;
-//     customMap.insert(1.3, "One point three");
-//     customMap.insert(2.4, "Two point four");
-//     customMap.insert(3.5, "Three point five");
+//     CustomMap2<float, string> CustomMap2;
+//     CustomMap2.insert(1.3, "One point three");
+//     CustomMap2.insert(2.4, "Two point four");
+//     CustomMap2.insert(3.5, "Three point five");
 
 //     // Get all keys and print them
-//     std::vector<float> keys = customMap.getAllKeys();
+//     std::vector<float> keys = CustomMap2.getAllKeys();
 //     cout << "All Keys: ";
 //     for (const auto& key : keys) {
 //         cout << key << " ";
