@@ -4,11 +4,13 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <map>
-#include <queue>
-#include "pq_buy.cpp"
-#include "pq_sell.cpp"
+
+// #include <queue>
+#include "headers/pq_buy.cpp"
+#include "headers/pq_sell.cpp"
+#include "../phase1/headers/string_extra.cpp"
 using namespace std;
+
 
 
 struct executed_order{
@@ -40,23 +42,24 @@ void print_all_orders(vector<order> orders){
         print_order(orders[i]);
     }
 }
-void print_buy_pq(priority_queue<order, vector<order>, buy_order_compare> pq){
-    while(pq.size() > 0){
-        print_order(pq.top());
-        pq.pop();
-    }
-}
+// void print_buy_pq(priority_queue<order, vector<order>, buy_order_compare> pq){
+//     while(pq.size() > 0){
+//         print_order(pq.top());
+//         pq.pop();
+//     }
+// }
 
-void print_sell_pq(priority_queue<order, vector<order>, sell_order_compare> pq){
-    while(pq.size() > 0){
-        print_order(pq.top());
-        pq.pop();
-    }
-}
+// void print_sell_pq(priority_queue<order, vector<order>, sell_order_compare> pq){
+//     while(pq.size() > 0){
+//         print_order(pq.top());
+//         pq.pop();
+//     }
+// }
 
 
 market::market(int argc, char** argv)
-{       
+{    
+    
     // Open a file for reading
     std::ifstream inputFile("output.txt");
     // Check if the file is open
@@ -65,16 +68,19 @@ market::market(int argc, char** argv)
     }
 
     // Read and parse the file line by line
+
     std::string line;
     while (std::getline(inputFile, line, '\n')) {
         // Process each line (parse as needed)
+        line = strip(line);
         if(line == "TL") continue;
         if (line == "!@") break;
 
         vector<string> tokens;
+        string token;
         std::istringstream ss(line);
-        while(std::getline(ss, line, ' ')) {
-            tokens.push_back(line);
+        while(std::getline(ss, token, ' ')) {
+            tokens.push_back(token);
         }
         
         int sz = tokens.size();
@@ -94,7 +100,8 @@ market::market(int argc, char** argv)
 
         std::string stock_data_string = stonk;
 
-        std::map<std::string, int> stock_map;
+        
+        CustomMap2<std::string, int> stock_map;
 
         std::istringstream iss(stock_data_string);
 
@@ -111,28 +118,32 @@ market::market(int argc, char** argv)
             string stock_name = tokens_stonk[i];
 
             if(i+1 == tokens_stonk.size()){    //if last token
-                stock_map[stock_name] = 1;      //default quantity is 1
+                stock_map.set(stock_name, 1);      //default quantity is 1
                 break;
             }
 
             if(tokens_stonk[i+1][0] - '0' <=9 && tokens_stonk[i+1][0] - '0' >=0){   //if next token is a number
                 int stock_quantity = stoi(tokens_stonk[i + 1]);
-                stock_map[stock_name] = stock_quantity;
+                stock_map.set(stock_name, stock_quantity);
                 i++;
             }
 
             else{
-                stock_map[stock_name] = 1;      //default quantity is 1
+                stock_map.set(stock_name, 1);      //default quantity is 1
             }
         }
-
+    
         stonk = "";
-        for(auto it = stock_map.begin(); it != stock_map.end(); it++){
-            stonk += (it->first + " ");
-            if(it->second != 1){
-                stonk += (to_string(it->second) + " ");
+
+        vector <string> keys_for_considered_stonks = stock_map.getAllKeys();
+            for(int j = 0; j<keys_for_considered_stonks.size(); j++){
+                stonk += (keys_for_considered_stonks[j] + " ");
+                int k = stock_map.get(keys_for_considered_stonks[j]);
+                if(k != 1){
+                    stonk += (to_string(k) + " ");
+                }
             }
-        }
+        
 
         stonk.pop_back();   //remove last space
 
@@ -152,16 +163,16 @@ market::market(int argc, char** argv)
         o.price = price;
         o.quantity = quantity;
 
-        if(bs == 1) {
-            buy_orders.push_back(o);
-            indices[all_num] = buy_num;
-            buy_num++;
-        }
-        else{
-            sell_orders.push_back(o);
-            indices[all_num] = sell_num;
-            sell_num++;
-        }
+        // if(bs == 1) {
+        //     buy_orders.push_back(o);
+        //     indices[all_num] = buy_num;
+        //     buy_num++;
+        // }
+        // else{
+        //     sell_orders.push_back(o);
+        //     indices[all_num] = sell_num;
+        //     sell_num++;
+        // }
 
         all_orders.push_back(o);
         all_num++;
@@ -190,44 +201,64 @@ market::market(int argc, char** argv)
 void market::start()
 {  
     vector<executed_order> executed;
-    map<string, priority_queue<order, vector<order>, buy_order_compare>> buy_map; //stonk name, priority queue of buy orders
-    map<string, priority_queue<order, vector <order>, sell_order_compare>> sell_map; //stonk name, priority queue of sell orders
+    CustomMap2<string, buy_priority_queue> buy_map; //stonk name, priority queue of buy orders
+    CustomMap2<string, sell_priority_queue> sell_map; //stonk name, priority queue of sell orders
 
     for(int i=0;i<all_orders.size();i++){
         if(all_orders[i].bs == 1){          //buy order hai
 
-            if(sell_map.find(all_orders[i].stonk) == sell_map.end()){   //if no sell orders for this stonk to match with
-                buy_map[all_orders[i].stonk].push(all_orders[i]);
+            if(!sell_map.contains(all_orders[i].stonk)){   //if no sell orders for this stonk to match with
+                if(buy_map.contains(all_orders[i].stonk)){
+                    auto a = buy_map.get(all_orders[i].stonk);
+                    a.push(all_orders[i]);
+                    buy_map.set(all_orders[i].stonk, a);
+                } 
+                else{
+                    buy_priority_queue temp;
+                    temp.push(all_orders[i]);
+                    buy_map.set(all_orders[i].stonk, temp);
+                }
             }
+
         
             else{//if there are sell orders for this stonk
 
-                while(sell_map[all_orders[i].stonk].size() > 0 && 
-                (sell_map[all_orders[i].stonk].top().expiry < all_orders[i].issue && sell_map[all_orders[i].stonk].top().expiry != -1)){
-                    sell_map[all_orders[i].stonk].pop();  //remove all expired top sell orders
-                    
+                while(sell_map.get(all_orders[i].stonk).size() > 0 && 
+                (sell_map.get(all_orders[i].stonk).top().expiry < all_orders[i].issue && sell_map.get(all_orders[i].stonk).top().expiry != -1)){
+                    auto a = sell_map.get(all_orders[i].stonk);
+                    a.pop();  //remove all expired top sell orders
+                    sell_map.set(all_orders[i].stonk, a);
                 }
 
-                while(sell_map[all_orders[i].stonk].size() > 0 && sell_map[all_orders[i].stonk].top().price <= all_orders[i].price){    //matching hai
-                    order s = sell_map[all_orders[i].stonk].top();
+                while(sell_map.get(all_orders[i].stonk).size() > 0 && sell_map.get(all_orders[i].stonk).top().price <= all_orders[i].price){    //matching hai
+                    order s = sell_map.get(all_orders[i].stonk).top();
                     int qty = min(all_orders[i].quantity, s.quantity);
                     all_orders[i].quantity -= qty;
                     s.quantity -= qty;
 
                     if(s.quantity == 0) {
-                        sell_map[all_orders[i].stonk].pop();    //if sell order is completely executed, remove it
-                        while(sell_map[all_orders[i].stonk].size() > 0 && 
-                            (sell_map[all_orders[i].stonk].top().expiry < all_orders[i].issue && sell_map[all_orders[i].stonk].top().expiry != -1)){
-                                sell_map[all_orders[i].stonk].pop();  //make sure the order at top of queue is not expired
+                        auto a = sell_map.get(all_orders[i].stonk);
+                        a.pop();    //if sell order is completely executed, remove it
+                        sell_map.set(all_orders[i].stonk, a);
+                       //if sell order is completely executed, remove it
+                        while(sell_map.get(all_orders[i].stonk).size() > 0 && 
+                            (sell_map.get(all_orders[i].stonk).top().expiry < all_orders[i].issue && sell_map.get(all_orders[i].stonk).top().expiry != -1)){
+                                auto a = sell_map.get(all_orders[i].stonk);
+                                a.pop();  //make sure the order at top of queue is not expired
+                                sell_map.set(all_orders[i].stonk, a);
+                                  //make sure the order at top of queue is not expired
                     
                         }
                     }
                     //move on to next sell order
                     else {
-                        sell_map[all_orders[i].stonk].pop();    //else update the quantity of the sell order (essentiallybuy order fully executed)
-                        if(s.quantity > 0) sell_map[all_orders[i].stonk].push(s); //if sell order is not completely executed, push it back into the queue
+                        auto a = sell_map.get(all_orders[i].stonk);
+                        a.pop();    //else update the quantity of the sell order (essentiallybuy order fully executed)
+                        if(s.quantity > 0) a.push(s); //if sell order is not completely executed, push it back into the queue
+                        sell_map.set(all_orders[i].stonk, a);
+                        
                     }
-                    buy_orders[indices[i]].quantity -= qty;
+                    // buy_orders[indices[i]].quantity -= qty;
                 
                     executed_order final_order;
                     final_order.buyer = all_orders[i].broker;
@@ -246,7 +277,9 @@ void market::start()
                 }
 
                 if(all_orders[i].quantity > 0){ //if buy order is not completely executed, push it into the queue
-                    buy_map[all_orders[i].stonk].push(all_orders[i]);
+                    auto a = buy_map.get(all_orders[i].stonk);
+                    a.push(all_orders[i]);
+                    buy_map.set(all_orders[i].stonk, a);
                 }
             }
 
@@ -254,37 +287,49 @@ void market::start()
         }
 
         else{                 //sell order hai
-            if(buy_map.find(all_orders[i].stonk) == buy_map.end()){
-                    sell_map[all_orders[i].stonk].push(all_orders[i]);
+            
+            if(!buy_map.contains(all_orders[i].stonk)){
+                    auto a = sell_map.get(all_orders[i].stonk);
+                    a.push(all_orders[i]);
+                    sell_map.set(all_orders[i].stonk, a);
                 }
 
             else{
 
-                while(buy_map[all_orders[i].stonk].size() > 0 &&
-                (buy_map[all_orders[i].stonk].top().expiry < all_orders[i].issue && buy_map[all_orders[i].stonk].top().expiry != -1)){
-                    buy_map[all_orders[i].stonk].pop();  //remove all expired buy orders
+                while(buy_map.get(all_orders[i].stonk).size() > 0 &&
+                (buy_map.get(all_orders[i].stonk).top().expiry < all_orders[i].issue && buy_map.get(all_orders[i].stonk).top().expiry != -1)){
+                    auto a = buy_map.get(all_orders[i].stonk);
+                    a.pop();  //remove all expired buy orders
+                    buy_map.set(all_orders[i].stonk, a);
                 }
 
-                while(buy_map[all_orders[i].stonk].size() > 0 && buy_map[all_orders[i].stonk].top().price >= all_orders[i].price){
-                    order b = buy_map[all_orders[i].stonk].top();
+                while(buy_map.get(all_orders[i].stonk).size() > 0 && buy_map.get(all_orders[i].stonk).top().price >= all_orders[i].price){
+                    order b = buy_map.get(all_orders[i].stonk).top();
                     int qty = min(all_orders[i].quantity, b.quantity);
                     all_orders[i].quantity -= qty;
                     b.quantity -= qty;
-                    sell_orders[indices[i]].quantity -= qty;
+                    // sell_orders[indices[i]].quantity -= qty;
 
                     if(b.quantity == 0) {
-                        buy_map[all_orders[i].stonk].pop(); //if buy order is completely executed, remove it
-                        while(buy_map[all_orders[i].stonk].size() > 0 && 
-                            (buy_map[all_orders[i].stonk].top().expiry < all_orders[i].issue && buy_map[all_orders[i].stonk].top().expiry != -1)){
-                                buy_map[all_orders[i].stonk].pop();  //make sure the order at top of queue is not expired
+                        auto a = buy_map.get(all_orders[i].stonk);
+                        a.pop();    //if buy order is completely executed, remove it
+                        buy_map.set(all_orders[i].stonk, a);
+                        while(buy_map.get(all_orders[i].stonk).size() > 0 && 
+                            (buy_map.get(all_orders[i].stonk).top().expiry < all_orders[i].issue && buy_map.get(all_orders[i].stonk).top().expiry != -1)){
+                                auto a = buy_map.get(all_orders[i].stonk);
+                                a.pop();
+                                buy_map.set(all_orders[i].stonk, a);
                     
                         }
                     }
                     //move on to next buy order
 
                     else {
-                        buy_map[all_orders[i].stonk].pop();    //else update the quantity of the buy order (essentially sell order fully executed)
-                        if(b.quantity > 0) buy_map[all_orders[i].stonk].push(b); //if buy order is not completely executed, push it back into the queue
+                        auto a = buy_map.get(all_orders[i].stonk);
+                        a.pop();    //else update the quantity of the buy order (essentially sell order fully executed)
+                        if(b.quantity > 0) a.push(b); //if buy order is not completely executed, push it back into the queue
+                        buy_map.set(all_orders[i].stonk, a);
+                        
                     }
                 
                     executed_order final_order;
@@ -304,7 +349,9 @@ void market::start()
                 }
 
                 if(all_orders[i].quantity > 0){ //partial sell order execution
-                    sell_map[all_orders[i].stonk].push(all_orders[i]);
+                    auto a = sell_map.get(all_orders[i].stonk);
+                    a.push(all_orders[i]);
+                    sell_map.set(all_orders[i].stonk, a);
                 }
             }
             
@@ -314,25 +361,25 @@ void market::start()
     //NOW PROCESS END OF DAY OUTPUT hehe
     int total_money_transferred = 0;
     int num_shares_traded = 0;
-    map<string, vector<int>> broker_stats;  //broker name, [num shares bought, num shares sold, total money]
+    CustomMap2<string, vector<int>> broker_stats;  //broker name, [num shares bought, num shares sold, total money]
     for(int i = 0; i<executed.size(); i++){
         total_money_transferred += executed[i].price * executed[i].quantity;
         num_shares_traded += executed[i].quantity;
         
-        if(broker_stats.find(executed[i].buyer) == broker_stats.end()){
-            broker_stats[executed[i].buyer] = {executed[i].quantity, 0, -1*executed[i].price*executed[i].quantity};
+        if(!broker_stats.contains(executed[i].buyer)){
+            broker_stats.set(executed[i].buyer, {executed[i].quantity, 0, -1*executed[i].price*executed[i].quantity});
         }
         else{
-            broker_stats[executed[i].buyer][0] += executed[i].quantity;
-            broker_stats[executed[i].buyer][2] -= executed[i].price*executed[i].quantity;
+            broker_stats.get(executed[i].buyer)[0] += executed[i].quantity;
+            broker_stats.get(executed[i].buyer)[2] -= executed[i].price*executed[i].quantity;
         }
 
-        if(broker_stats.find(executed[i].seller) == broker_stats.end()){
-            broker_stats[executed[i].seller] = {0, executed[i].quantity, executed[i].price*executed[i].quantity};
+        if(!broker_stats.contains(executed[i].seller)){
+            broker_stats.set(executed[i].seller, {0, executed[i].quantity, executed[i].price*executed[i].quantity});
         }
         else{
-            broker_stats[executed[i].seller][1] += executed[i].quantity;
-            broker_stats[executed[i].seller][2] += executed[i].price*executed[i].quantity;
+            broker_stats.get(executed[i].seller)[1] += executed[i].quantity;
+            broker_stats.get(executed[i].seller)[2] += executed[i].price*executed[i].quantity;
         }
     }
 
@@ -343,8 +390,11 @@ void market::start()
     cout<<"Number of Completed Trades: "<<executed.size()<<endl;
     cout<<"Number of Shares Traded: "<<num_shares_traded<<endl;
     
-    for(auto it = broker_stats.begin(); it != broker_stats.end(); it++){
-        cout<<it->first<<" bought "<<it->second[0]<<" and sold "<<it->second[1]<<" for a net transfer of $"<<it->second[2]<<endl;
+    vector<string> broker_stats_keys = broker_stats.getAllKeys();
+    for(int i = 0; i<broker_stats_keys.size(); i++){
+        cout<<broker_stats_keys[i]<<" bought "<<broker_stats.get(broker_stats_keys[i])[0]<<" and sold "<<broker_stats.get(broker_stats_keys[i])[1]<<" for a net transfer of $"<<broker_stats.get(broker_stats_keys[i])[2]<<endl;
     }
+    // for(auto it = broker_stats.begin(); it != broker_stats.end(); it++){
+    //     cout<<it->first<<" bought "<<it->second[0]<<" and sold "<<it->second[1]<<" for a net transfer of $"<<it->second[2]<<endl;
+    // }
 }
-

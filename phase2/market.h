@@ -2,10 +2,10 @@
 #define MARKET_H
 #include <iostream>
 #include <string>
-#include <map>
 #include <vector>
+#include "headers/map_new.cpp"
 using namespace std;
-
+    
 struct order
 {
     string stonk;
@@ -67,7 +67,7 @@ public:
 	vector <order> buy_orders;
     vector <order> sell_orders;
 	vector <order> all_orders;
-	map <int, int> indices;	//all_orders indices corresponding to buy_orders and sell_orders
+	CustomMap2 <int, int> indices;	//all_orders indices corresponding to buy_orders and sell_orders
 	int all_num = 0;
 	int buy_num = 0;
 	int sell_num = 0;

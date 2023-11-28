@@ -51,6 +51,7 @@ void* userTrader(void* arg)
 }
 
 int main(int argc, char** argv) {
+    
     std::cout << "TL" << std::endl;
     std::vector<pthread_t> clientThreads;
     for (int i=0;i<NUM_THREADS;i++){
@@ -81,8 +82,10 @@ int main(int argc, char** argv) {
     pthread_join(clientThreads[NUM_THREADS], NULL);
 
     std::cout << "@!" << std::endl; // Indicates the end of user input
+    
 
     market marketMaker(argc, argv);
+    
     std::cout << "Successfully Initiated!" << std::endl;
     marketMaker.start();
 
