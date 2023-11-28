@@ -3,67 +3,35 @@ TL
 0 KarGoCorp SELL AMZN $100 #30 10
 1 KarGoCorp BUY GE $200 #20 8
 1 KarGoKrab BUY AMZN $130 #12 0
-2 KarGoTravels BUY AMD $100 #50 10
 2 KarGoCorp BUY AMZN $50 #30 5
-3 KarGoKrab BUY AMD $130 #10 7
+2 KarGoTravels BUY AMD $100 #50 10
 3 KarGoCorp SELL AMZN $50 #5 0
-4 KarGoExpress SELL GE $150 #50 6
+3 KarGoKrab BUY AMD $130 #10 7
 4 KarGoTravels BUY AMD $150 #25 0
+4 KarGoExpress SELL GE $150 #50 6
+4 KarGoExpress SELL AMD $80 #100 -1
 5 KarGoExpress BUY NFLX $80 #15 6
-5 KarGoExpress SELL AMD $80 #100 -1
-6 KarGoTravels SELL AMZN $50 #22 -1
 6 KarGoCorp BUY AMD $120 #10 1
-7 KarGoCorp SELL GE $50 #15 -1
+6 KarGoTravels SELL AMZN $50 #22 -1
 7 KarGoKrab BUY GE $110 #10 3
+7 KarGoCorp SELL GE $50 #15 -1
 !@
 @!
 Successfully Initiated!
-AA purchased 3 share of AMD from AKG for $242/share
-SM purchased 7 share of NFLX from AKG for $290/share
-OT purchased 11 share of AMD from OT for $271/share
-SM purchased 2 share of GE from AKG for $107/share
-KA purchased 3 share of GE from AKG for $43/share
-SV purchased 9 share of GE from SV for $486/share
-OT purchased 5 share of AMD from AA for $422/share
-AA purchased 1 share of AMD from AA for $242/share
-SV purchased 3 share of GE from GS for $486/share
-KA purchased 3 share of GE from GS for $337/share
-AA purchased 5 share of AMZN from KG for $166/share
-AA purchased 7 share of AMZN from KA for $379/share
-AA purchased 4 share of AMD from GS for $242/share
-SV purchased 1 share of AMD from GS for $200/share
-SM purchased 4 share of AMD from GS for $192/share
-AA purchased 2 share of AMZN from SV for $379/share
-SV purchased 7 share of AMZN from SV for $350/share
-SV purchased 5 share of GE from SM for $87/share
-KA purchased 3 share of NFLX from KA for $350/share
-SM purchased 3 share of GE from KG for $35/share
-SM purchased 7 share of GE from GS for $138/share
-KA purchased 9 share of NFLX from AA for $459/share
-AKG purchased 3 share of GE from GS for $138/share
-AKG purchased 12 share of GE from AKG for $211/share
-OT purchased 3 share of AAPL from GS for $377/share
-KA purchased 13 share of AMD from OT for $354/share
-SM purchased 1 share of AMD from SV for $297/share
-OT purchased 2 share of AAPL from SM for $380/share
-OT purchased 4 share of GE from KG for $290/share
-OT purchased 6 share of GE from OT for $290/share
-KA purchased 3 share of GE from OT for $284/share
-SM purchased 5 share of AMZN from AKG for $111/share
-SV purchased 6 share of GE from OT for $99/share
-SV purchased 8 share of GE from SV for $300/share
-SM purchased 6 share of GE from OT for $29/share
-SM purchased 1 share of GE from AKG for $30/share
+KarGoKrab purchased 12 share of AMZN from KarGoCorp for $100/share
+KarGoCorp purchased 5 share of AMZN from KarGoCorp for $50/share
+KarGoCorp purchased 20 share of GE from KarGoExpress for $200/share
+KarGoKrab purchased 10 share of A B 2 C 3 from KarGoExpress for $130/share
+KarGoTravels purchased 50 share of A B 2 C 3 from KarGoExpress for $100/share
+KarGoCorp purchased 22 share of AMZN from KarGoTravels for $50/share
+KarGoCorp purchased 10 share of A B 2 C 3 from KarGoExpress for $80/share
+KarGoKrab purchased 10 share of GE from KarGoCorp for $50/share
 
 ---End of Day---
-Total Amount of Money Transferred: $47830
-Number of Completed Trades: 36
-Number of Shares Traded: 177
-AA bought 22 and sold 15 for a net transfer of $306
-AKG bought 15 and sold 33 for a net transfer of $3270
-GS bought 0 and sold 28 for a net transfer of $6916
-KA bought 34 and sold 10 for a net transfer of $-8072
-KG bought 0 and sold 12 for a net transfer of $2095
-OT bought 31 and sold 45 for a net transfer of $1061
-SM bought 36 and sold 7 for a net transfer of $-3944
-SV bought 39 and sold 27 for a net transfer of $-1632
+Total Amount of Money Transferred: $14150
+Number of Completed Trades: 8
+Number of Shares Traded: 139
+KarGoCorp bought 0 and sold 12 for a net transfer of $1200
+KarGoExpress bought 0 and sold 20 for a net transfer of $4000
+KarGoKrab bought 12 and sold 0 for a net transfer of $-1200
+KarGoTravels bought 50 and sold 0 for a net transfer of $-5000

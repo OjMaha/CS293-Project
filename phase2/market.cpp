@@ -1,14 +1,12 @@
-#include "market.h"
+//#include "market.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
-
-// #include <queue>
 #include "headers/pq_buy.cpp"
 #include "headers/pq_sell.cpp"
-#include "../phase1/headers/string_extra.cpp"
+
 using namespace std;
 
 
@@ -21,7 +19,7 @@ struct executed_order{
     int quantity;
 };
 
-    
+
 void print_order(order o){
     cout << "issue time:"<<o.issue << " " <<"broker:"<< o.broker << " " <<"BS"<< o.bs << " " << o.stonk 
     << " " <<"price"<< o.price << " " << "quantity"<<o.quantity << " " <<"expiresat:"<< o.expiry << endl;

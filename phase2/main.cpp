@@ -8,6 +8,9 @@
 #include <vector>
 #include <pthread.h>
 #include "market.h"
+//#include "trader_tk.cpp"
+
+
 
 
 int NUM_THREADS = 2; // Number of worker threads

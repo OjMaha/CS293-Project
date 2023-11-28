@@ -10,8 +10,8 @@ market: main.cpp market.cpp worker.cpp blank_trader.cpp
 	./market 2 > tk_input.txt
 
 # For part2
-trader: main.cpp market.cpp worker.cpp trader.cpp
-	g++ -std=c++20 main.cpp market.cpp worker.cpp trader.cpp -lpthread -o trader
+trader: main.cpp market.cpp worker.cpp trader_tk.cpp
+	g++ -std=c++20 main.cpp market.cpp worker.cpp trader_tk.cpp -lpthread -o trader
 	./trader 2 > output.txt
 
 clean:

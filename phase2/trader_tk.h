@@ -2,6 +2,7 @@
 #ifndef TRADER_TK_H
 #define TRADER_TK_H
 
+
 #include <string>
 
 int reader(int time);

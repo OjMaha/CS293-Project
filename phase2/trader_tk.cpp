@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <atomic>
 #include <string>
 #include <vector>
@@ -6,7 +7,25 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
+// #include "market.h"
+
 using namespace std;
+
+
+
+// std::string strip1(const std::string& input, const std::string& chars = " \t\n\r") {
+//     size_t start = input.find_first_not_of(chars);
+//     if (start == std::string::npos) {
+//         return ""; // Entire string is composed of specified characters
+//     }
+
+//     size_t end = input.find_last_not_of(chars);
+//     if (end == std::string::npos) {
+//         return ""; // Entire string is composed of specified characters
+//     }
+
+//     return input.substr(start, end - start + 1);
+// }
 
 extern std::atomic<int> commonTimer;
 extern std::mutex printMutex;  // Declare the mutex for printing
@@ -56,16 +75,19 @@ int reader(int time)
         if (line.compare("TL") == 0) {
             continue;
         }
+        //line = strip1(line);
         vector<string> tokens;
-        string l;
+        string token;
+        
+
         std::istringstream ss(line);
-        while(std::getline(ss, l, ' ')) {
-            tokens.push_back(l);
+        while(std::getline(ss, token, ' ')) {
+            tokens.push_back(token);
         }
 
-        int inTime = line[0] - '0';
-        if(inTime > 9)
-        int outTime = line[line.size() - 2] - '0';
+        int inTime = stoi(tokens[0]);
+        int outTime = stoi(tokens[tokens.size()-1]);
+        
         std::cout<<"inTime is "<<inTime<<" outTime is "<<outTime<<"\r\n";
         if (inTime + outTime > 5 || outTime == -1) {
             lit.enqueue(line);
@@ -97,22 +119,22 @@ int trader(std::string *message)
     return 1;
 }
 
-void* userThread(void* arg) 
-{
-    // int thread_id = *static_cast<int*>(arg);
-    while (true) {
-        int currentTime;
-        {
-            currentTime = commonTimer.load();
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500)); 
-        int end = reader(currentTime);
-        if (end) break;
-    }
-    return nullptr;
-}
+// void* userThread(void* arg) 
+// {
+//     // int thread_id = *static_cast<int*>(arg);
+//     while (true) {
+//         int currentTime;
+//         {
+//             currentTime = commonTimer.load();
+//         }
+//         std::this_thread::sleep_for(std::chrono::milliseconds(500)); 
+//         int end = reader(currentTime);
+//         if (end) break;
+//     }
+//     return nullptr;
+// }
 
-void* userTrader(void* arg)
-{
-    return nullptr;
-}
+// void* userTrader(void* arg)
+// {
+//     return nullptr;
+// }
